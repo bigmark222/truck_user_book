@@ -2,7 +2,7 @@
 
 Set up Truck’s rendering environment and open a blank window (wgpu + winit).
 
-Reference: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_1.rs
+Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_1.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_1.rs)
 
 ## Dependencies (`Cargo.toml`)
 
@@ -25,7 +25,7 @@ wasm-bindgen-futures = "0.4.37"
 ## Add the helper module
 
 Download `app.rs` from:
-https://github.com/ricosjp/truck/blob/truck-rendimpl-v0.6.0/truck-rendimpl/examples/app.rs
+[github.com/ricosjp/truck/blob/truck-rendimpl-v0.6.0/truck-rendimpl/examples/app.rs](https://github.com/ricosjp/truck/blob/truck-rendimpl-v0.6.0/truck-rendimpl/examples/app.rs)
 
 Place it at `src/app.rs`. It wraps rendering boilerplate and defines the `App` trait.
 

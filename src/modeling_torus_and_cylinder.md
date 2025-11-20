@@ -2,7 +2,7 @@
 
 Create two classic curved solids with Truck’s B-rep tools: a torus (donut) and a cylinder. Both rely on sweeping operations.
 
-Reference: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_2.rs
+Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_2.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_2.rs)
 
 ## Torus (rotational sweep)
 

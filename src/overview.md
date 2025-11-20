@@ -18,7 +18,7 @@ This tutorial focuses primarily on Users.
 
 ## Sample code
 
-All examples live at https://github.com/ricosjp/truck-tutorial-code/tree/v0.1
+All examples live at [github.com/ricosjp/truck-tutorial-code/tree/v0.1](https://github.com/ricosjp/truck-tutorial-code/tree/v0.1)
 
 - `src/section2_1.rs` corresponds to Section 2.1 “First Triangle”.
 - Run with: `cargo run --bin section2_1`

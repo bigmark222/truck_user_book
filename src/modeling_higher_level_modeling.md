@@ -2,7 +2,7 @@
 
 Model a bottle using Truck’s lower-level B-rep APIs (inspired by the classic OCCT bottle tutorial). This walks through building parts, adding openings, and creating an inner cavity.
 
-Reference: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_3.rs
+Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_3.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_3.rs)
 
 ## Components
 

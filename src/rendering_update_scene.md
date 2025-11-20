@@ -2,7 +2,7 @@
 
 Animate the camera and multiple lights around a teapot to create a dynamic scene.
 
-Reference: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_3.rs
+Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_3.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_3.rs)
 
 ## Imports
 

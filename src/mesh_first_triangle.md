@@ -2,7 +2,7 @@
 
 In this first example, we’ll create the simplest possible mesh: a single triangle. By the end of this section, you will generate an `.obj` file you can view in any 3D viewer.
 
-Reference code: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_1.rs
+Reference code: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_1.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_1.rs)
 
 ## Create a new workspace
 

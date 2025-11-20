@@ -2,7 +2,7 @@
 
 Build two slightly more complex meshes: an equilateral triangular pyramid (tetrahedron) and a cube. These examples show how to construct multi-face objects using vertex lists and face index lists.
 
-Reference code: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_2.rs
+Reference code: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_2.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_2.rs)
 
 ## Equilateral triangular pyramid
 

@@ -2,7 +2,7 @@
 
 Use Truck’s mesh filters to clean, modify, and analyze meshes before rendering or export.
 
-Reference: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_5.rs
+Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_5.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_5.rs)
 
 ## Topology conditions
 

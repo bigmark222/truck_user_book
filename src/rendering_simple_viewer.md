@@ -2,7 +2,7 @@
 
 Build a minimal 3D viewer that can display a mesh, zoom, rotate, and load OBJ files via drag-and-drop.
 
-Reference: https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_4.rs
+Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_4.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter4/src/section4_4.rs)
 
 ## Imports
 
