@@ -1,4 +1,5 @@
-# Truck User Book
+# [Truck User Book] (https://bigmark222.github.io/truck_book/)
+
 
 MDNbook content for Truck tutorials covering meshes, modeling (B-rep), and rendering. Use `mdbook` to build or serve locally.
 
