@@ -1,6 +1,6 @@
 # Overview
 
-Welcome to Truck, a pure-Rust CAD kernel with modern, modular tools for geometric modeling. This book walks through [meshes](https://en.wikipedia.org/wiki/Mesh_generation), [B-reps](https://en.wikipedia.org/wiki/Boundary_representation), and [rendering](https://en.wikipedia.org/wiki/Rendering_(computer_graphics)) with Truck.
+Welcome to Truck, a pure-Rust [CAD kernel](https://en.wikipedia.org/wiki/Geometric_modeling_kernel) with modern, modular tools for geometric modeling. This book walks through [meshes](https://en.wikipedia.org/wiki/Mesh_generation), [B-reps](https://en.wikipedia.org/wiki/Boundary_representation), and [rendering](https://en.wikipedia.org/wiki/Rendering_(computer_graphics)) with Truck.
 
 ## The three core ideas
 
