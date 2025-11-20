@@ -5,13 +5,21 @@ In this first example, we’ll create the simplest possible mesh: a single trian
 Reference code: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_1.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_1.rs)
 
 ## Create a new workspace
+This directory will be your working folder for the tutorial. You can name it anything you like.
 
 ```bash
 cargo new --bin <workspace-name>
 cd <workspace-name>
 ```
+<details>
+<summary>Example copy/paste cargo project creation</summary>
 
-This directory will be your working folder for the tutorial. You can name it anything you like.
+```bash
+cargo new --bin truck_user_tutorial
+cd truck_user_tutorial
+```
+
+</details>
 
 ## Add dependencies
 
@@ -86,7 +94,7 @@ Both are fine for quick checks but limited for edge display and advanced visuali
 
 ### A better viewer (recommended)
 
-ParaView (https://www.paraview.org/) offers:
+[ParaView](https://www.paraview.org/) offers:
 
 - edge display
 - surface shading
