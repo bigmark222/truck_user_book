@@ -1,0 +1,9 @@
+[book]
+title = "Truck User Book"
+src = "src"
+language = "en"
+multilingual = false
+
+[build]
+# Emit site into docs/ so GitHub Pages can serve it from the main branch.
+build-dir = "docs"

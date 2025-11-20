@@ -10,7 +10,7 @@ Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/sectio
 /// Create an equilateral triangular pyramid
 fn trigonal_pyramid() -> PolygonMesh { 
 
-    // STEP 1-4 GO IN HERE
+    // STEPS 1-4 GO IN HERE
     
 }
 ```
@@ -61,7 +61,6 @@ Index mapping:
 
 ### Step 5 - Create Write to OBJ Function
 
-This goes outside of the main function.
 ```rust
 /// Output the contents of `polygon` to the file specified by `path`.
 fn write_polygon(polygon: &PolygonMesh, path: &str) {
@@ -73,8 +72,6 @@ fn write_polygon(polygon: &PolygonMesh, path: &str) {
 
 ```rust
 fn main() {
-    /// REST OF CODE
-
     write_polygon(&trigonal_pyramid(), "trigonal-pyramid.obj");
 }
 ```
