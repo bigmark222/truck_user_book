@@ -1,6 +1,6 @@
 # Normals
 
-Add normals to meshes in Truck so lighting and shading look correct.
+Add [normals](https://en.wikipedia.org/wiki/Normal_(geometry)) to meshes in Truck so lighting and shading look correct.
 
 ## Why normals matter
 
