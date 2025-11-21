@@ -42,6 +42,27 @@ fn trigonal_pyramid() -> PolygonMesh {
         [2, 0, 3],   // side 3
     ]);
 ```
+<details>
+<summary><strong>Face orientation (important)</strong></summary>
+
+#### Face orientation = the order you list a triangle’s vertices.
+
+- CCW order (counter-clockwise) → face points toward you
+
+- CW order (clockwise) → face points away from you
+
+Rendering engines often hide back faces, so a reversed order can make a face look inside-out or invisible.
+
+#### Rule:
+
+##### When looking at the outside of your shape, list triangle vertices counter-clockwise.
+
+That’s all you need.
+
+![Triangle face winding order in Unity](images/winding-order=triangle-unity.png)
+
+</details>
+
 ### Step 4 — build the mesh
 ```rust
     PolygonMesh::new(attrs, faces)
@@ -76,12 +97,9 @@ fn main() {
 }
 ```
 
-Run:
+#### Run:
 
 ```bash
 cargo run
 ```
 
-## Face orientation (important)
-
-Face orientation is determined by vertex order. For closed shapes, a right-handed screw motion along the vertex order should point outward. Reversing a face (e.g., `[0, 1, 2]` -> `[2, 1, 0]`) can make it render inside-out or invisible in some viewers.

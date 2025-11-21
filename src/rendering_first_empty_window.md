@@ -40,6 +40,8 @@ use winit::window::Window;
 
 struct MyApp;
 
+// Use async_trait without Send because our renderer runs on one thread.
+// Prevents Rust from requiring all async futures to be thread-safe.
 #[async_trait(?Send)]
 impl App for MyApp {
     async fn init(_: Arc<Window>) -> Self {
