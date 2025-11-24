@@ -4,8 +4,8 @@ An icosahedron is the [dual](https://en.wikipedia.org/wiki/Dual_polyhedron) of a
 
 Steps:
 - Find every dodecahedron face center.
-- Normalize those centers to the unit sphere → 20 vertices.
-- Group the three centers around each original dodecahedron vertex → 20 faces.
+- [Normalize](https://en.wikipedia.org/wiki/Normal_(geometry)) those centers to the [unit sphere](https://en.wikipedia.org/wiki/Unit_sphere) → 20 vertices.
+- Group the three centers around each original dodecahedron vertex (corner) → 20 faces.
 
 ![Icosahedron from dodecahedron illustration](images/icosa_from_dodeca.png)
 ##### The yellow icosahedron appears if you remove the orange reference dodecahedron.
