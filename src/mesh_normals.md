@@ -160,13 +160,13 @@ let faces: Faces = (0..6)
 5) Export:
 
 ```rust
-fn write_polygon(mesh: &PolygonMesh, path: &str) {
+fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
 
 let sphere = PolygonMesh::new(attrs, faces);
-write_polygon(&sphere, "sphere.obj");
+write_polygon_mesh(&sphere, "sphere.obj");
 ```
 
 ## When to recompute normals

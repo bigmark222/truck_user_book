@@ -26,7 +26,8 @@ To render or export, B-rep solids are tessellated into polygon meshes. Truck’s
 ## What you will learn in Chapter 3
 
 - **3.1 Cube**: build an exact cube; see how B-rep solids are assembled.
-- **3.2 Torus and Cylinder**: work with parametric surfaces; combine curved faces into a solid.
-- **3.3 Higher Level Modeling**: model with NURBS; build solids from exact curved surfaces instead of approximations.
+- **3.2 Torus**: work with rotational sweeps to create curved surfaces.
+- **3.3 Cylinder**: combine rotational, planar, and translational sweeps for a solid.
+- **3.4 Higher Level Modeling**: model with NURBS; build solids from exact curved surfaces instead of approximations.
 
 By the end of this chapter, you’ll understand how Truck represents CAD-quality shapes—far more precise than meshes.

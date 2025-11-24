@@ -1,124 +1,71 @@
-Significance of normals as vertex attributes
+# Normals - Sphere
 
-Up to the previous section, we have displayed polyhedrons, but many of the 3D shapes we usually see are rounded. On the other hand, since meshes are often used to display 3D shapes, rounded shapes are approximated by meshes. If the approximated mesh is displayed as it is, the sphere will appear as if it were a mirror ball. Graphics arbitrarily changes the normals during radiance calculation to achieve a smooth curved surface. Specifically, the data of the normals are registered to the vertices of the mesh, and the points on the triangular surface are calculated by linear interpolation of them to obtain values.
+Vertex normals are what make a low-poly sphere look smooth instead of faceted. Here we’ll inflate a cube into a sphere, assign per-vertex normals, and export an OBJ.
 
-This is a bit difficult to explain, so we will explain it step by step: In 3D graphics, the color of each point on a mesh is calculated and rendered pixel by pixel based on a three-dimensional physical model The simplest optical model used in 3D graphics is the Lambert model. In the Lambert model, the brightness (radiance) of each point on a pure white object surface is expressed as max(-l.dot(n), 0) using the light incident vector l and the surface normal n. In this calculation, there is no rule that the normal of the triangle on the mesh must be used. For example, if you are drawing a mesh that approximates a sphere, such as a mirror ball, it is more appropriate to use the spherical normals at points on the approximated sphere than the triangles. In reality, the spherical information is lost when the surface is meshed, so the spherical normals are registered at the mesh vertices and the normals at the other points on the mesh are linearly interpolated.
+## Why vertex normals change the look
 
-If no normals are registered for the mesh, the viewer algorithm completes the normals: the Windows standard viewer and Paraview use the normals of the polygon as is, while the MacOS standard viewer tries to draw the mesh smoothly by averaging the normals of the faces adjacent to the vertices. If you run the section2_4.rs code with the normal completion line commented out as shown below, there should be a difference in edge clarity between the Windows standard viewer and the Mac standard viewer when the output is displayed.
+- **Face normals only:** every quad or triangle shades independently; spheres look like mirror balls.
+- **Vertex normals:** store one normal per vertex, let the viewer interpolate across the surface; shading appears round.
 
-fn write_polyhedron(mut polygon: PolygonMesh, path: &str) {
-    // create output obj file
-    let mut obj = std::fs::File::create(path).unwrap();
-    // add a normal to polyhedron. This will explained in the later sections.
-    // polygon.add_naive_normals(true);
-    // output polygon to obj file.
-    obj::write(&polygon, &mut obj).unwrap();
-}
-Creation of a mesh with normals
+If a mesh ships without normals, viewers guess differently (Windows/ParaView use face normals; macOS averages adjacent faces). Providing normals removes that guesswork.
 
-Now that you have learned the significance of registering normals to a mesh, let's actually create a mesh sphere with normals registered. truck has some normal completion algorithms, but if exact values exist, directly assigning those values will produce a more accurate drawing.
+## Full example: cube → sphere with normals
 
-While meshing a spherical surface can be done using latitude and longitude, here the mesh is created by inflating a regular hexahedron. This way, the area ratio of the mesh is not too large and the shape can be expressed using only a rectangular mesh. First, let's divert the saving functions for the regular hexahedron created in the previous section and the mesh without normal completion created even earlier.
+Reuse the shared `write_polygon_mesh` helper and `hexahedron()` shape from `lib.rs` to keep the sample lean:
 
+```rust
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
+use truck_meshes::{hexahedron, write_polygon_mesh};
 
-/// Output the contents of `polygon` to the file specified by `path`.
-fn write_polygon(polygon: &PolygonMesh, path: &str) {
-    // create output obj file
-    let mut obj = std::fs::File::create(path).unwrap();
-    // output polygon to obj file.
-    obj::write(polygon, &mut obj).unwrap();
-}
+const DIVISION: usize = 8; // subdivide each cube edge
 
-fn hexahedron() -> PolygonMesh {
-    let a = f64::sqrt(3.0) / 3.0;
-    let positions = vec![
-        Point3::new(-a, -a, -a),
-        Point3::new(a, -a, -a),
-        Point3::new(a, a, -a),
-        Point3::new(-a, a, -a),
-        Point3::new(-a, -a, a),
-        Point3::new(a, -a, a),
-        Point3::new(a, a, a),
-        Point3::new(-a, a, a),
-    ];
-    let attrs = StandardAttributes {
-        positions,
-        ..Default::default()
-    };
-    let faces = Faces::from_iter([
-        [3, 2, 1, 0],
-        [0, 1, 5, 4],
-        [1, 2, 6, 5],
-        [2, 3, 7, 6],
-        [3, 0, 4, 7],
-        [4, 5, 6, 7],
-    ]);
-    PolygonMesh::new(attrs, faces)
-}
-In the following, we write the main function directly. By dividing each edge of the regular hexahedron into 8 parts, each face is divided into 64 parts, and by projecting the vertices onto the unit sphere, we can create the vertices of a mesh like a mirror ball.
-
-    // create hexahedron
+/// Subdivide the cube, project to a unit sphere, and attach vertex normals.
+fn sphere_with_normals() -> PolygonMesh {
     let hexa = hexahedron();
-    // edge parts
-    const DIVISION: usize = 8;
-    // the positions of vertices
+
+    // Subdivide each cube face into a grid and project points to the unit sphere.
     let positions: Vec<Point3> = hexa
-        // for each face of the hexahedron
         .face_iter()
         .flat_map(|face| {
-            // each vertex into a vector
             let v: Vec<Vector3> = face
                 .iter()
                 .map(|vertex| hexa.positions()[vertex.pos].to_vec())
                 .collect();
-            // create lattice of the square
+
             (0..=DIVISION)
                 .flat_map(move |i| (0..=DIVISION).map(move |j| (i, j)))
-                // each i, j runs from 0 to `DIVISION`
                 .map(move |(i, j)| {
                     let s = i as f64 / DIVISION as f64;
                     let t = j as f64 / DIVISION as f64;
-                    // 線形補間により正方形の格子点を求める
-                    v[0] * (1.0 - s) * (1.0 - t)
-                        + v[1] * s * (1.0 - t)
-                        + v[3] * (1.0 - s) * t
-                        + v[2] * s * t
+
+                    let p =
+                        v[0] * (1.0 - s) * (1.0 - t) +
+                        v[1] * s         * (1.0 - t) +
+                        v[3] * (1.0 - s) * t +
+                        v[2] * s         * t;
+
+                    Point3::from_vec(p.normalize())
                 })
         })
-        // noramalize for projecting onto the unit sphere
-        .map(|vec| Point3::from_vec(vec.normalize()))
         .collect();
-The normal of each point on the unit sphere is obtained by vectorizing the coordinates of that point as is.
 
-    // the sets of all normals
-    let normals = positions.iter().copied().map(Point3::to_vec).collect();
-Creates a vertex information structure in which vertex coordinates and normals are registered.
+    // For a unit sphere, the position direction is the normal.
+    let normals: Vec<Vector3> = positions.iter().copied().map(Point3::to_vec).collect();
 
-    // this time, register the coordinates and normals
-    let attrs = StandardAttributes {
-        positions,
-        normals,
-        ..Default::default()
-    };
-Let us create a surface. This time we also have normals, so we need to set the coordinates and normal indices for the vertices. This time, the coordinates and normals happen to have the same index, but there are cases where different normals correspond to the same coordinate vertex, so the coordinates and normals should be registered separately.
+    // Pair positions with normals.
+    let attrs = StandardAttributes { positions, normals, ..Default::default() };
 
-
-    // the set of faces
+    // Faces reference both position and normal indices (they match here).
     let faces: Faces = (0..6)
-        // divide each faces
         .flat_map(|face_idx| {
-            // the index of the first vertex on the `face_idx`th face
             let base = face_idx * (DIVISION + 1) * (DIVISION + 1);
-            // the closure returns the index of the (i, j) vertex on the square
+
             let to_index = move |i: usize, j: usize| {
                 let idx = base + (DIVISION + 1) * i + j;
-                // (index of position, None, Some(index of normal))
-                // The middle component is texture. We do not treat texture in this tutorial.
-                (idx, None, Some(idx))
+                (idx, None, Some(idx)) // (position, texture, normal)
             };
-            // construct mesh with subdivisions of the square
+
             (0..DIVISION)
                 .flat_map(move |i| (0..DIVISION).map(move |j| (i, j)))
                 .map(move |(i, j)| {
@@ -131,7 +78,53 @@ Let us create a surface. This time we also have normals, so we need to set the c
                 })
         })
         .collect();
-Now we are ready to go. Let us create a mesh and export it!
 
-    let sphere = PolygonMesh::new(attrs, faces);
-    write_polygon(&sphere, "sphere.obj");
+    PolygonMesh::new(attrs, faces)
+}
+
+fn main() {
+    let sphere = sphere_with_normals();          // build subdivided, normalized sphere mesh
+    write_polygon_mesh(&sphere, "sphere.obj");   // export as OBJ for inspection
+}
+```
+
+## What to look for
+
+- The OBJ contains per-vertex normals, so most viewers will render it smoothly.
+- Because positions and normals share indices, the mesh stays compact; if you ever vary normals independently, keep the separate indices pattern shown above.
+- Increase `DIVISION` for a denser sphere; shading stays smooth because normals are normalized unit vectors. 
+
+<details>
+<summary>Updated directory layout</summary>
+
+```
+truck_meshes/
+├─ Cargo.toml
+├─ src/
+│  ├─ lib.rs
+│  ├─ shapes/
+│  │  ├─ mod.rs
+│  │  ├─ triangle.rs
+│  │  ├─ square.rs
+│  │  ├─ tetrahedron.rs
+│  │  ├─ hexahedron.rs
+│  │  ├─ octahedron.rs
+│  │  ├─ dodecahedron.rs
+│  │  └─ icosahedron.rs
+│  └─ utils/
+│     ├─ mod.rs
+│     └─ normal_helpers.rs
+└─ examples/
+   ├─ shapes/
+   │  ├─ triangle.rs
+   │  ├─ square.rs
+   │  ├─ tetrahedron.rs
+   │  ├─ hexahedron.rs
+   │  ├─ octahedron.rs
+   │  ├─ dodecahedron.rs
+   │  └─ icosahedron.rs
+   └─ normals/
+      ├─ icosahedron.rs
+      └─ sphere.rs
+```
+</details>

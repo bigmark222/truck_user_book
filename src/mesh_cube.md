@@ -8,7 +8,7 @@
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-// ...keep earlier functions: write_polygon, triangle, square, tetrahedron...
+// ...keep earlier functions: write_polygon_mesh, triangle, square, tetrahedron...
 pub mod hexahedron; //add this
 pub use hexahedron::hexahedron; //add this
 ```
@@ -76,7 +76,7 @@ Add `examples/hexahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon(&mesh, "cube.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "cube.obj");
 }
 ```
 
@@ -117,7 +117,7 @@ use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -176,7 +176,7 @@ pub fn hexahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon(&mesh, "cube.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "cube.obj");
 }
 ```
 

@@ -10,7 +10,7 @@ Add an octahedron to the `truck_meshes` library (8 triangular faces), in its own
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-// ...keep earlier functions: write_polygon, triangle, square, tetrahedron, hexahedron...
+// ...keep earlier functions: write_polygon_mesh, triangle, square, tetrahedron, hexahedron...
 pub mod octahedron;
 pub use octahedron::octahedron;
 ```
@@ -74,7 +74,7 @@ Add `examples/octahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::octahedron();
-    truck_meshes::write_polygon(&mesh, "octahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "octahedron.obj");
 }
 ```
 
@@ -117,7 +117,7 @@ use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -179,7 +179,7 @@ pub fn octahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::octahedron();
-    truck_meshes::write_polygon(&mesh, "octahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "octahedron.obj");
 }
 ```
 

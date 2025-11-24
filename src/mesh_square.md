@@ -12,7 +12,7 @@ Reference code: same setup as [triangle](mesh_first_triangle.md), but with 4 ver
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-// ...keep `write_polygon` and `triangle()` above...
+// ...keep `write_polygon_mesh` and `triangle()` above...
 pub mod square; // add this
 pub use square::square; // add this
 ```
@@ -73,7 +73,7 @@ Add `examples/square.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::square();
-    truck_meshes::write_polygon(&mesh, "square.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "square.obj");
 }
 ```
 
@@ -110,7 +110,7 @@ use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -155,7 +155,7 @@ pub fn square() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::square();
-    truck_meshes::write_polygon(&mesh, "square.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "square.obj");
 }
 ```
 

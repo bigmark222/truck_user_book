@@ -101,7 +101,7 @@ Add `examples/icosahedron.rs`:
 fn main() {
     let mut mesh = truck_meshes::icosahedron();
     mesh.add_naive_normals(true); // optional, for shading
-    truck_meshes::write_polygon(&mesh, "icosahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "icosahedron.obj");
 }
 ```
 
@@ -147,7 +147,7 @@ truck_meshes/
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -231,7 +231,7 @@ pub fn icosahedron() -> PolygonMesh {
 fn main() {
     let mut mesh = truck_meshes::icosahedron();
     mesh.add_naive_normals(true);
-    truck_meshes::write_polygon(&mesh, "icosahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "icosahedron.obj");
 }
 ```
 

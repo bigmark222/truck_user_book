@@ -10,7 +10,7 @@ use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -84,7 +84,7 @@ Specify the triangle’s topology by listing vertex indices. The single face ref
 <details>
 <summary>Explanation</summary>
 
-Assemble the mesh by pairing the attribute data with the face list. The returned `PolygonMesh` is ready to render or export (e.g., via `write_polygon` to an OBJ file).
+Assemble the mesh by pairing the attribute data with the face list. The returned `PolygonMesh` is ready to render or export (e.g., via `write_polygon_mesh` to an OBJ file).
 
 </details>
 
@@ -95,7 +95,7 @@ Add a tiny example at `examples/triangle.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::triangle();
-    truck_meshes::write_polygon(&mesh, "triangle.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "triangle.obj");
 }
 ```
 
@@ -133,7 +133,7 @@ truck_meshes/
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -170,7 +170,7 @@ pub fn triangle() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::triangle();
-    truck_meshes::write_polygon(&mesh, "triangle.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "triangle.obj");
 }
 ```
 

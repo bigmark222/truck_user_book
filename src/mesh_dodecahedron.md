@@ -115,7 +115,7 @@ Add `examples/dodecahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::dodecahedron();
-    truck_meshes::write_polygon(&mesh, "dodecahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "dodecahedron.obj");
 }
 ```
 
@@ -159,7 +159,7 @@ truck_meshes/
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -248,7 +248,7 @@ pub fn dodecahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::dodecahedron();
-    truck_meshes::write_polygon(&mesh, "dodecahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "dodecahedron.obj");
 }
 ```
 

@@ -8,7 +8,7 @@
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-// ...keep `write_polygon`, `triangle()`, and `square()` above...
+// ...keep `write_polygon_mesh`, `triangle()`, and `square()` above...
 pub mod tetrahedron; // add this
 pub use tetrahedron::tetrahedron; // add this
 ```
@@ -80,7 +80,7 @@ Add `examples/tetrahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::tetrahedron();
-    truck_meshes::write_polygon(&mesh, "tetrahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "tetrahedron.obj");
 }
 ```
 
@@ -119,7 +119,7 @@ use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
-pub fn write_polygon(mesh: &PolygonMesh, path: &str) {
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
     let mut obj = std::fs::File::create(path).unwrap();
     obj::write(mesh, &mut obj).unwrap();
 }
@@ -169,7 +169,7 @@ pub fn tetrahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::tetrahedron();
-    truck_meshes::write_polygon(&mesh, "tetrahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "tetrahedron.obj");
 }
 ```
 
