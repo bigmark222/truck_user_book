@@ -1,7 +1,3 @@
-Goal: create a solid cylinder using a mix of rotational, planar, and translational sweeps.
-
-Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_2.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_2.rs)
-
 ## Cylinder (rotational + planar + translational sweep)
 
 ```rust

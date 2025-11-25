@@ -5,7 +5,7 @@ Welcome to Truck, a pure-Rust [CAD kernel](https://en.wikipedia.org/wiki/Geometr
 ## The three core ideas
 
 1. **Trendy tools**: [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)) for safety/performance; [WebGPU](https://en.wikipedia.org/wiki/WebGPU) via Rust's [three-d](https://github.com/asny/three-d) library for fast, cross-platform graphics and compute.
-2. **Traditional arts (modernized)**: Re-implements classic CAD concepts (B-rep, [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)) with [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language))/[WebGPU](https://en.wikipedia.org/wiki/WebGPU) for stability and testability.
+2. **Traditional arts (modernized)**: Re-implements classic CAD concepts (B-rep, [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)) with Rust/WebGPU for stability and testability.
 3. **Modular Design ([Theseus’ Ship](https://en.wikipedia.org/wiki/Ship_of_Theseus))**: Small, replaceable crates so you can swap or evolve parts independently without breaking the whole system.
 
 ## Who this book is for
@@ -14,7 +14,7 @@ Welcome to Truck, a pure-Rust [CAD kernel](https://en.wikipedia.org/wiki/Geometr
 - **Developers**: Create new geometric tools/elements on Truck.
 - **Contributors**: Contribute directly to Truck’s codebase.
 
-This tutorial focuses primarily on Users.
+This tutorial focuses primarily on **Users**.
 
 ## System requirements
 

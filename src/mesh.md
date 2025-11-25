@@ -1,6 +1,6 @@
 # Mesh
 
-In this chapter, we’ll learn how to work with polygon meshes—often simply called meshes. Most real-time graphics systems—like OpenGL, Vulkan, WebGPU, and game engines—expect 3D objects to be provided as meshes, so mastering them is essential for rendering and geometric processing.
+In this chapter, we’ll learn how to work with polygon meshes—often simply called meshes. Most real-time graphics systems—like OpenGL, Vulkan, WebGPU, and game engines—expect 3D objects to be provided as meshes, so mastering them is essential for rendering and [geometric processing](https://en.wikipedia.org/wiki/Geometry_processing).
 
 ![Mesh illustration](images/Dolphin_triangle_mesh.png)
 <small>Source: [Polygon mesh](https://en.wikipedia.org/wiki/Polygon_mesh)</small>
