@@ -56,12 +56,6 @@ truck_meshes/
 └─ output/          # optional: generated OBJ files from examples
 ```
 
-Create the mesh output folder once so example OBJ files land in a predictable place:
-
-```bash
-mkdir -p truck_meshes/output
-```
-
 Add a sibling crate dedicated to B-rep modeling so analytic solids and exports stay isolated. Name it `truck_brep` (create it from the parent directory that already contains `truck_meshes`):
 
 ```bash
