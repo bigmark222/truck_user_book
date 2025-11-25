@@ -119,3 +119,76 @@ truck_brep/
 ```
 
 </details>
+
+<details>
+<summary>Complete code (lib + shapes + bin)</summary>
+
+**src/lib.rs**
+
+```rust
+pub mod shapes;
+pub use shapes::{
+    cube, save_obj, save_step, torus, save_torus_obj, save_torus_step,
+    cylinder, save_cylinder_obj, save_cylinder_step,
+};
+```
+
+**src/shapes/mod.rs**
+
+```rust
+pub mod cube;
+pub mod torus;
+pub mod cylinder;
+
+pub use cube::{cube, save_obj, save_step};
+pub use torus::{torus, save_torus_obj, save_torus_step};
+pub use cylinder::{cylinder, save_cylinder_obj, save_cylinder_step};
+```
+
+**src/shapes/cylinder.rs**
+
+```rust
+use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
+
+pub fn cylinder() -> Solid {
+    let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
+    let circle: Wire = builder::rsweep(
+        &vertex,
+        Point3::new(0.0, 1.0, -1.0),
+        Vector3::unit_z(),
+        Rad(7.0),
+    );
+    let disk: Face = builder::try_attach_plane(&vec![circle]).expect("cannot attach plane");
+    builder::tsweep(&disk, 2.0 * Vector3::unit_z())
+}
+
+pub fn save_cylinder_obj(solid: &Solid, path: &str) {
+    let mesh_with_topology = solid.triangulation(0.01);
+    let mesh = mesh_with_topology.to_polygon();
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+}
+
+pub fn save_cylinder_step(solid: &Solid, path: &str) {
+    let compressed = solid.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(path, display.to_string()).unwrap();
+}
+```
+
+**src/bin/cylinder.rs**
+
+```rust
+fn main() {
+    let cylinder = truck_brep::cylinder();
+    truck_brep::save_cylinder_obj(&cylinder, "output/cylinder.obj");
+    truck_brep::save_cylinder_step(&cylinder, "output/cylinder.step");
+}
+```
+
+</details>

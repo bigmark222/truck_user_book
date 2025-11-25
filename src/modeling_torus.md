@@ -108,3 +108,70 @@ truck_brep/
 ```
 
 </details>
+
+<details>
+<summary>Complete code (lib + shapes + bin)</summary>
+
+**src/lib.rs**
+
+```rust
+pub mod shapes;
+pub use shapes::{cube, save_obj, save_step, torus, save_torus_obj, save_torus_step};
+```
+
+**src/shapes/mod.rs**
+
+```rust
+pub mod cube;
+pub mod torus;
+
+pub use cube::{cube, save_obj, save_step};
+pub use torus::{torus, save_torus_obj, save_torus_step};
+```
+
+**src/shapes/torus.rs**
+
+```rust
+use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
+
+pub fn torus() -> Shell {
+    let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, 1.0));
+    let circle: Wire = builder::rsweep(
+        &vertex,
+        Point3::new(0.0, 0.5, 1.0),
+        Vector3::unit_x(),
+        Rad(7.0),
+    );
+    builder::rsweep(&circle, Point3::origin(), Vector3::unit_y(), Rad(7.0))
+}
+
+pub fn save_torus_obj(shell: &Shell, path: &str) {
+    let mesh_with_topology = shell.triangulation(0.01);
+    let mesh = mesh_with_topology.to_polygon();
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+}
+
+pub fn save_torus_step(shell: &Shell, path: &str) {
+    let compressed = shell.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(path, display.to_string()).unwrap();
+}
+```
+
+**src/bin/torus.rs**
+
+```rust
+fn main() {
+    let torus = truck_brep::torus();
+    truck_brep::save_torus_obj(&torus, "output/torus.obj");
+    truck_brep::save_torus_step(&torus, "output/torus.step");
+}
+```
+
+</details>
