@@ -2,8 +2,6 @@
 
 Build a torus (donut) with rotational sweeps, keeping the geometry and exports in the library just like the cube section. For the cylinder example, see `modeling_cylinder.md`.
 
-Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_2.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_2.rs)
-
 ## Torus via rotational sweeps (shapes module)
 
 Use `rsweep` twice: first to spin a vertex into a circle, then to spin that circle into the torus shell. Keep this in `src/shapes/torus.rs` so binaries stay minimal.

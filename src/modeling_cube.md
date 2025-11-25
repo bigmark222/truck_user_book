@@ -2,8 +2,6 @@
 
 Model a precise B-rep cube with Truck—exact geometry built from vertices, edges, faces, and a solid.
 
-Reference: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_1.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter3/src/section3_1.rs)
-
 ## Dependencies
 
 Add to `Cargo.toml`:
