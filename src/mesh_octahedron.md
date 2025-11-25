@@ -74,7 +74,7 @@ Add `examples/octahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::octahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "octahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/octahedron.obj");
 }
 ```
 
@@ -97,12 +97,13 @@ truck_meshes/
 │  ├─ tetrahedron.rs
 │  ├─ hexahedron.rs
 │  └─ octahedron.rs
-└─ examples/
-   ├─ triangle.rs
-   ├─ square.rs
-   ├─ tetrahedron.rs
-   ├─ hexahedron.rs
-   └─ octahedron.rs
+├─ examples/
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  ├─ hexahedron.rs
+│  └─ octahedron.rs
+└─ output/          # exported OBJ files (e.g., output/octahedron.obj)
 ```
 
 </details>
@@ -179,7 +180,7 @@ pub fn octahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::octahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "octahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/octahedron.obj");
 }
 ```
 

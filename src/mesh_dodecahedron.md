@@ -115,7 +115,7 @@ Add `examples/dodecahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::dodecahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "dodecahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/dodecahedron.obj");
 }
 ```
 
@@ -139,13 +139,14 @@ truck_meshes/
 │  ├─ hexahedron.rs
 │  ├─ octahedron.rs
 │  └─ dodecahedron.rs
-└─ examples/
-   ├─ triangle.rs
-   ├─ square.rs
-   ├─ tetrahedron.rs
-   ├─ hexahedron.rs
-   ├─ octahedron.rs
-   └─ dodecahedron.rs
+├─ examples/
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  ├─ hexahedron.rs
+│  ├─ octahedron.rs
+│  └─ dodecahedron.rs
+└─ output/          # exported OBJ files (e.g., output/dodecahedron.obj)
 ```
 
 </details>
@@ -248,7 +249,7 @@ pub fn dodecahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::dodecahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "dodecahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/dodecahedron.obj");
 }
 ```
 

@@ -46,10 +46,11 @@ truck_meshes/
 ├─ Cargo.toml
 ├─ src/
 │  └─ lib.rs
-│ 
-└─ examples/
-   └─ 
-   
+├─ examples/
+│  └─ 
+└─ output/   # exported OBJ files live here (create once)
 ```
 
 </details>
+
+Keep `write_polygon_mesh` generic—pass the path you want (e.g., `output/triangle.obj`) from each example rather than hardcoding the output folder inside the helper.

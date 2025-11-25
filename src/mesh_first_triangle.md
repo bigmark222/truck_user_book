@@ -95,7 +95,7 @@ Add a tiny example at `examples/triangle.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::triangle();
-    truck_meshes::write_polygon_mesh(&mesh, "triangle.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/triangle.obj");
 }
 ```
 
@@ -107,7 +107,7 @@ cargo run --example triangle
 
 ## View it
 
-Open `triangle.obj` in Preview/3D Viewer/ParaView/Blender. You should see a single triangle.
+Open `output/triangle.obj` in Preview/3D Viewer/ParaView/Blender. You should see a single triangle.
 
 <details>
 <summary>File tree after this step</summary>
@@ -118,8 +118,9 @@ truck_meshes/
 ├─ src/
 │  ├─ lib.rs
 │  └─ triangle.rs
-└─ examples/
-   └─ triangle.rs   (optional helper to export)
+├─ examples/
+│  └─ triangle.rs   (optional helper to export)
+└─ output/          # exported OBJ files (e.g., output/triangle.obj)
 ```
 
 </details>
@@ -170,7 +171,7 @@ pub fn triangle() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::triangle();
-    truck_meshes::write_polygon_mesh(&mesh, "triangle.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/triangle.obj");
 }
 ```
 

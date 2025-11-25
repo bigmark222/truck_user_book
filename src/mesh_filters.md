@@ -43,7 +43,7 @@ Faceted (per-face) normals:
 
 ```rust
 mesh.add_naive_normals(true); // overwrite existing normals
-write_polygon_mesh(&mesh, "mirror-ball.obj");
+write_polygon_mesh(&mesh, "output/mirror-ball.obj");
 ```
 
 Smooth normals (blend across angles):
@@ -51,7 +51,7 @@ Smooth normals (blend across angles):
 ```rust
 // 1.0 rad (~57°) smooths most edges; lower keeps creases
 mesh.add_smooth_normals(1.0, true);
-write_polygon_mesh(&mesh, "mirror-ball-with-smooth-normal.obj");
+write_polygon_mesh(&mesh, "output/mirror-ball-with-smooth-normal.obj");
 ```
 
 ## When to use which
@@ -99,11 +99,11 @@ fn main() {
 
     // Flat normals for a faceted look
     mesh.add_naive_normals(true);
-    write_polygon_mesh(&mesh, "mirror-ball.obj");
+    write_polygon_mesh(&mesh, "output/mirror-ball.obj");
 
     // Smooth normals for softer shading
     mesh.add_smooth_normals(1.0, true); // ~57° crease angle
-    write_polygon_mesh(&mesh, "mirror-ball-with-smooth-normal.obj");
+    write_polygon_mesh(&mesh, "output/mirror-ball-with-smooth-normal.obj");
 }
 ```
 </details>

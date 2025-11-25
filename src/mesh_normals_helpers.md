@@ -120,7 +120,7 @@ Convenience wrapper that computes and writes per-face normals in-place.
 ```rust
 let mut mesh = build_mesh();
 add_face_normals(&mut mesh);
-write_polygon_mesh(&mesh, "with-face-normals.obj");
+write_polygon_mesh(&mesh, "output/with-face-normals.obj");
 ```
 </details>
 

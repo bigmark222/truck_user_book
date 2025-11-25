@@ -21,13 +21,13 @@ fn main() {
     // Flat shading: one normal per triangle
     let mut flat = icosahedron();
     add_face_normals(&mut flat);
-    write_polygon_mesh(&flat, "icosahedron_flat.obj");
+    write_polygon_mesh(&flat, "output/icosahedron_flat.obj");
 
     // Smooth shading: blended normals per vertex
     let mut smooth = icosahedron();
     add_vertex_normals(&mut smooth);
     normalize_vertex_normals(&mut smooth); // keep them unit length
-    write_polygon_mesh(&smooth, "icosahedron_smooth.obj");
+    write_polygon_mesh(&smooth, "output/icosahedron_smooth.obj");
 }
 ```
 

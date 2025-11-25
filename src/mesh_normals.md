@@ -166,7 +166,7 @@ fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
 }
 
 let sphere = PolygonMesh::new(attrs, faces);
-write_polygon_mesh(&sphere, "sphere.obj");
+write_polygon_mesh(&sphere, "output/sphere.obj");
 ```
 
 ## When to recompute normals

@@ -45,7 +45,7 @@ fn save_shape(solid: &Solid, name: &str) {
     // Mesh + OBJ
     let mesh_with_topology = solid.triangulation(0.01); // tolerance
     let mesh = mesh_with_topology.to_polygon();
-    let mut obj = std::fs::File::create(format!("{name}.obj")).unwrap();
+    let mut obj = std::fs::File::create(format!("output/{name}.obj")).unwrap();
     obj::write(&mesh, &mut obj).unwrap();
 
     // STEP (exact B-rep)
@@ -54,7 +54,7 @@ fn save_shape(solid: &Solid, name: &str) {
         StepModel::from(&compressed),
         Default::default(),
     );
-    std::fs::write(format!("{name}.step"), display.to_string()).unwrap();
+    std::fs::write(format!("output/{name}.step"), display.to_string()).unwrap();
 }
 
 fn main() {
@@ -67,3 +67,59 @@ fn main() {
 - `rsweep`: rotational sweep to build circular edges
 - `try_attach_plane`: turn a closed planar wire into a face
 - `tsweep`: translational sweep to create solids from faces
+
+<details>
+<summary>Directory tree (for this section)</summary>
+
+```
+truck_brep/
+├─ Cargo.toml
+├─ src/
+│  ├─ lib.rs
+│  └─ bin/
+│     └─ cylinder.rs
+└─ output/            # cylinder.obj, cylinder.step
+```
+
+</details>
+
+<details>
+<summary>Complete code (src/bin/cylinder.rs)</summary>
+
+```rust
+use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
+
+fn cylinder() -> Solid {
+    let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
+    let circle: Wire = builder::rsweep(
+        &vertex,
+        Point3::new(0.0, 1.0, -1.0),
+        Vector3::unit_z(),
+        Rad(7.0),
+    );
+    let disk: Face = builder::try_attach_plane(&vec![circle]).expect("cannot attach plane");
+    builder::tsweep(&disk, 2.0 * Vector3::unit_z())
+}
+
+fn save_shape(solid: &Solid, name: &str) {
+    let mesh_with_topology = solid.triangulation(0.01);
+    let mesh = mesh_with_topology.to_polygon();
+    let mut obj = std::fs::File::create(format!("output/{name}.obj")).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+
+    let compressed = solid.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(format!("output/{name}.step"), display.to_string()).unwrap();
+}
+
+fn main() {
+    save_shape(&cylinder(), "cylinder");
+}
+```
+
+</details>

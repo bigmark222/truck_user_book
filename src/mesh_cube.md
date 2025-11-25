@@ -76,7 +76,7 @@ Add `examples/hexahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "cube.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/cube.obj");
 }
 ```
 
@@ -98,11 +98,12 @@ truck_meshes/
 │  ├─ square.rs
 │  ├─ tetrahedron.rs
 │  └─ hexahedron.rs
-└─ examples/
-   ├─ triangle.rs
-   ├─ square.rs
-   ├─ tetrahedron.rs
-   └─ hexahedron.rs
+├─ examples/
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  └─ hexahedron.rs
+└─ output/          # exported OBJ files (e.g., output/cube.obj)
 ```
 
 </details>
@@ -176,7 +177,7 @@ pub fn hexahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "cube.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/cube.obj");
 }
 ```
 

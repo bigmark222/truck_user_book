@@ -155,17 +155,18 @@ truck_meshes/
 │  └─ utils/
 │     ├─ mod.rs
 │     └─ normal_helpers.rs
-└─ examples/
-   ├─ shapes/
-   │  ├─ triangle.rs
-   │  ├─ square.rs
-   │  ├─ tetrahedron.rs
-   │  ├─ hexahedron.rs
-   │  ├─ octahedron.rs
-   │  ├─ dodecahedron.rs
-   │  └─ icosahedron.rs
-   └─ normals/
-      └─ icosahedron.rs
+├─ examples/
+│  ├─ shapes/
+│  │  ├─ triangle.rs
+│  │  ├─ square.rs
+│  │  ├─ tetrahedron.rs
+│  │  ├─ hexahedron.rs
+│  │  ├─ octahedron.rs
+│  │  ├─ dodecahedron.rs
+│  │  └─ icosahedron.rs
+│  └─ normals/
+│     └─ icosahedron.rs
+└─ output/          # exported OBJ files from examples
 ```
 </details>
 

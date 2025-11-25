@@ -73,7 +73,7 @@ Add `examples/square.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::square();
-    truck_meshes::write_polygon_mesh(&mesh, "square.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/square.obj");
 }
 ```
 
@@ -93,9 +93,10 @@ truck_meshes/
 │  ├─ lib.rs
 │  ├─ triangle.rs
 │  └─ square.rs
-└─ examples/
-   ├─ triangle.rs
-   └─ square.rs
+├─ examples/
+│  ├─ triangle.rs
+│  └─ square.rs
+└─ output/          # exported OBJ files (e.g., output/square.obj)
 ```
 
 </details>
@@ -155,7 +156,7 @@ pub fn square() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::square();
-    truck_meshes::write_polygon_mesh(&mesh, "square.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/square.obj");
 }
 ```
 

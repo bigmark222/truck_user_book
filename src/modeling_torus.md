@@ -39,7 +39,7 @@ fn save_shape(shell: &Shell, name: &str) {
     // Mesh + OBJ
     let mesh_with_topology = shell.triangulation(0.01); // tolerance
     let mesh = mesh_with_topology.to_polygon();
-    let mut obj = std::fs::File::create(format!("{name}.obj")).unwrap();
+    let mut obj = std::fs::File::create(format!("output/{name}.obj")).unwrap();
     obj::write(&mesh, &mut obj).unwrap();
 
     // STEP (exact B-rep)
@@ -48,7 +48,7 @@ fn save_shape(shell: &Shell, name: &str) {
         StepModel::from(&compressed),
         Default::default(),
     );
-    std::fs::write(format!("{name}.step"), display.to_string()).unwrap();
+    std::fs::write(format!("output/{name}.step"), display.to_string()).unwrap();
 }
 
 fn main() {
@@ -60,3 +60,58 @@ fn main() {
 
 - `rsweep`: rotational sweep for circular shapes
 - `Shell`: collection of faces without interior volume (torus surface)
+
+<details>
+<summary>Directory tree (for this section)</summary>
+
+```
+truck_brep/
+├─ Cargo.toml
+├─ src/
+│  ├─ lib.rs
+│  └─ bin/
+│     └─ torus.rs
+└─ output/            # torus.obj, torus.step
+```
+
+</details>
+
+<details>
+<summary>Complete code (src/bin/torus.rs)</summary>
+
+```rust
+use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
+
+fn torus() -> Shell {
+    let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, 1.0));
+    let circle: Wire = builder::rsweep(
+        &vertex,
+        Point3::new(0.0, 0.5, 1.0),
+        Vector3::unit_x(),
+        Rad(7.0),
+    );
+    builder::rsweep(&circle, Point3::origin(), Vector3::unit_y(), Rad(7.0))
+}
+
+fn save_shape(shell: &Shell, name: &str) {
+    let mesh_with_topology = shell.triangulation(0.01);
+    let mesh = mesh_with_topology.to_polygon();
+    let mut obj = std::fs::File::create(format!("output/{name}.obj")).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+
+    let compressed = shell.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(format!("output/{name}.step"), display.to_string()).unwrap();
+}
+
+fn main() {
+    save_shape(&torus(), "torus");
+}
+```
+
+</details>

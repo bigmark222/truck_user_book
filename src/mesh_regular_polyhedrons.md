@@ -28,11 +28,11 @@ fn main() {
     let icosa = icosahedron();
 
     // Save to OBJ
-    write_obj(&tetra, "tetrahedron.obj");
-    write_obj(&hexa, "hexahedron.obj");
-    write_obj(&octa, "octahedron.obj");
-    write_obj(&dodeca, "dodecahedron.obj");
-    write_obj(&icosa, "icosahedron.obj");
+    write_obj(&tetra, "output/tetrahedron.obj");
+    write_obj(&hexa, "output/hexahedron.obj");
+    write_obj(&octa, "output/octahedron.obj");
+    write_obj(&dodeca, "output/dodecahedron.obj");
+    write_obj(&icosa, "output/icosahedron.obj");
 }
 
 /// Helper for writing OBJ files

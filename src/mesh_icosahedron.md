@@ -101,7 +101,7 @@ Add `examples/icosahedron.rs`:
 fn main() {
     let mut mesh = truck_meshes::icosahedron();
     mesh.add_naive_normals(true); // optional, for shading
-    truck_meshes::write_polygon_mesh(&mesh, "icosahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/icosahedron.obj");
 }
 ```
 
@@ -126,14 +126,15 @@ truck_meshes/
 │  ├─ octahedron.rs
 │  ├─ dodecahedron.rs
 │  └─ icosahedron.rs
-└─ examples/
-   ├─ triangle.rs
-   ├─ square.rs
-   ├─ tetrahedron.rs
-   ├─ hexahedron.rs
-   ├─ octahedron.rs
-   ├─ dodecahedron.rs
-   └─ icosahedron.rs
+├─ examples/
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  ├─ hexahedron.rs
+│  ├─ octahedron.rs
+│  ├─ dodecahedron.rs
+│  └─ icosahedron.rs
+└─ output/          # exported OBJ files (e.g., output/icosahedron.obj)
 ```
 
 </details>
@@ -231,7 +232,7 @@ pub fn icosahedron() -> PolygonMesh {
 fn main() {
     let mut mesh = truck_meshes::icosahedron();
     mesh.add_naive_normals(true);
-    truck_meshes::write_polygon_mesh(&mesh, "icosahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/icosahedron.obj");
 }
 ```
 

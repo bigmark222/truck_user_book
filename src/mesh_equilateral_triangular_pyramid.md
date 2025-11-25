@@ -80,7 +80,7 @@ Add `examples/tetrahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::tetrahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "tetrahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/tetrahedron.obj");
 }
 ```
 
@@ -101,10 +101,11 @@ truck_meshes/
 │  ├─ triangle.rs
 │  ├─ square.rs
 │  └─ tetrahedron.rs
-└─ examples/
-   ├─ triangle.rs
-   ├─ square.rs
-   └─ tetrahedron.rs
+├─ examples/
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  └─ tetrahedron.rs
+└─ output/          # exported OBJ files (e.g., output/tetrahedron.obj)
 ```
 
 </details>
@@ -169,7 +170,7 @@ pub fn tetrahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::tetrahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "tetrahedron.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/tetrahedron.obj");
 }
 ```
 

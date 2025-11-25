@@ -84,7 +84,7 @@ fn sphere_with_normals() -> PolygonMesh {
 
 fn main() {
     let sphere = sphere_with_normals();          // build subdivided, normalized sphere mesh
-    write_polygon_mesh(&sphere, "sphere.obj");   // export as OBJ for inspection
+    write_polygon_mesh(&sphere, "output/sphere.obj");   // export as OBJ for inspection
 }
 ```
 
