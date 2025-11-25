@@ -68,10 +68,15 @@ fn main() {
 truck_brep/
 ├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs
+│  ├─ lib.rs              # re-exports shapes
+│  ├─ shapes/
+│  │  ├─ mod.rs           # exports cube, torus, ...
+│  │  ├─ cube.rs          # from previous section
+│  │  └─ torus.rs         # torus() + save helpers if desired
 │  └─ bin/
-│     └─ torus.rs
-└─ output/            # torus.obj, torus.step
+│     ├─ cube.rs          # from previous section
+│     └─ torus.rs         # calls into lib
+└─ output/                # torus.obj, torus.step
 ```
 
 </details>
