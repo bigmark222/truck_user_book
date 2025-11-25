@@ -1,12 +1,12 @@
 # Rendering
 
-Render Truck shapes with the built-in wgpu-based engine. This chapter introduces the rendering pipeline and a simple viewer.
+We’ll use the Rust crate [`three-d`](https://crates.io/crates/three-d) to open windows, load OBJ files exported from Truck, and preview them quickly.
 
 Topics:
 
-- **4.1 First Empty Window** — create a window with a GPU context
-- **4.2 First Scene** — load and draw a shape
-- **4.3 Update Scene** — animate or modify each frame
-- **4.4 Simple Viewer** — build a minimal viewer for your models
+- **4.1 Three-d Setup** — add three-d and open a blank window
+- **4.2 Render a Mesh** — load and render a Truck OBJ with lights/camera
+- **4.3 Orbit + Hot Reload** — navigation and auto-refresh on file change
+- **4.4 Reusable Viewer** — “drop in an OBJ and inspect” tool
 
-Let’s start by opening your first rendering window.
+We’ll also use `cargo watch` to automatically reload whenever the OBJ file you’re working on is updated.

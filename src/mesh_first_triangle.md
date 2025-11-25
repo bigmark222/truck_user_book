@@ -1,103 +1,178 @@
 # First Triangle
 
-In this first example, we’ll create the simplest possible mesh: a single triangle. By the end of this section, you will generate an `.obj` file you can view in any 3D viewer.
 
-Reference code: [github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_1.rs](https://github.com/ricosjp/truck-tutorial-code/blob/v0.6/chapter2/src/section2_1.rs)
+## Add the triangle module to lib.rs
 
-## Create a new workspace
-This directory will be your working folder for the tutorial. You can name it anything you like.
-
-```bash
-cargo new --bin <workspace-name>
-cd <workspace-name>
-```
-<details>
-<summary>Example copy/paste cargo project creation</summary>
-
-```bash
-cargo new --bin truck_user_tutorial
-cd truck_user_tutorial
-```
-
-</details>
-
-## Add dependencies
-
-Open your `Cargo.toml` and add the mesh algorithm crate:
-
-```toml
-[dependencies]
-truck-meshalgo = "0.6.0"
-```
-
-This crate contains everything you need to build and export polygon meshes.
-
-## Write the simplest OBJ file
-
-Open `src/main.rs` and replace it with:
+`src/lib.rs` (root exports + helper):
 
 ```rust
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-/// Create a mesh containing one equilateral triangle and save it as an OBJ file.
+/// Write any mesh to an OBJ file.
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(mesh, &mut obj).unwrap();
+}
+
+pub mod triangle; //add this
+pub use triangle::triangle; //add this
+```
+## Construct Main Function
+
+`src/triangle.rs`:
+
+```rust
+use std::iter::FromIterator;
+use truck_meshalgo::prelude::*;
+
+/// A single equilateral triangle in the XY plane.
+pub fn triangle() -> PolygonMesh {
+
+    //PLACE STEP 1-4 HERE
+
+}
+```
+#### Step 1: Define vertex positions
+```rust
+    let positions = vec![
+        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(1.0, 0.0, 0.0),
+        Point3::new(0.5, f64::sqrt(3.0) / 2.0, 0.0),
+    ];
+```
+<details>
+<summary>Explanation</summary>
+
+Create three `Point3` coordinates that form an equilateral triangle on the XY plane. Two points sit on the X axis at y = 0, and the third is lifted to `sqrt(3)/2` so all sides are length 1. These positions are the raw vertex data the mesh will consume.
+
+</details>
+
+#### Step 2: Build attribute set
+
+```rust
+    let attrs = StandardAttributes {
+        positions,
+        ..Default::default()
+    };
+```
+<details>
+<summary>Explanation</summary>
+
+Wrap the vertex positions into the `StandardAttributes` container, which is where meshes expect per-vertex data (positions, normals, UVs, etc.). We only set positions and leave every other attribute at its default.
+
+</details>
+
+#### Step 3: Define mesh faces
+
+```rust
+    let faces = Faces::from_iter([[0, 1, 2]]);
+```
+<details>
+<summary>Explanation</summary>
+
+Specify the triangle’s topology by listing vertex indices. The single face references vertices 0, 1, and 2 in counter-clockwise order, which sets the face normal to point along +Z.
+
+</details>
+
+#### Step 4: Construct the mesh
+
+```rust
+    PolygonMesh::new(attrs, faces)
+
+```
+<details>
+<summary>Explanation</summary>
+
+Assemble the mesh by pairing the attribute data with the face list. The returned `PolygonMesh` is ready to render or export (e.g., via `write_polygon_mesh` to an OBJ file).
+
+</details>
+
+## Export the triangle
+
+Add a tiny example at `examples/triangle.rs`:
+
+```rust
 fn main() {
-    // Vertex positions
+    let mesh = truck_meshes::triangle();
+    truck_meshes::write_polygon_mesh(&mesh, "output/triangle.obj");
+}
+```
+
+Run it:
+
+```bash
+cargo run --example triangle
+```
+
+## View it
+
+Open `output/triangle.obj` in Preview/3D Viewer/ParaView/Blender. You should see a single triangle.
+
+<details>
+<summary>File tree after this step</summary>
+
+```
+truck_meshes/
+├─ Cargo.toml
+├─ src/
+│  ├─ lib.rs
+│  └─ triangle.rs
+├─ examples/
+│  └─ triangle.rs   (optional helper to export)
+└─ output/          # exported OBJ files (e.g., output/triangle.obj)
+```
+
+</details>
+
+<details>
+<summary>Full code:</summary>
+
+`src/lib.rs`:
+
+```rust
+use std::iter::FromIterator;
+use truck_meshalgo::prelude::*;
+
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(mesh, &mut obj).unwrap();
+}
+
+pub mod triangle;
+pub use triangle::triangle;
+```
+
+`src/triangle.rs`:
+
+```rust
+use std::iter::FromIterator;
+use truck_meshalgo::prelude::*;
+
+pub fn triangle() -> PolygonMesh {
     let positions = vec![
         Point3::new(0.0, 0.0, 0.0),
         Point3::new(1.0, 0.0, 0.0),
         Point3::new(0.5, f64::sqrt(3.0) / 2.0, 0.0),
     ];
 
-    // Register the vertex attributes (positions only in this example)
     let attrs = StandardAttributes {
         positions,
         ..Default::default()
     };
 
-    // Create a single triangular face referencing the 3 vertices above
     let faces = Faces::from_iter([[0, 1, 2]]);
 
-    // Build the mesh
-    let polygon = PolygonMesh::new(attrs, faces);
+    PolygonMesh::new(attrs, faces)
+}
+```
+`examples/triangle.rs`:
 
-    // Write it to an OBJ file
-    let mut obj = std::fs::File::create("triangle.obj").unwrap();
-    obj::write(&polygon, &mut obj).unwrap();
+```rust
+fn main() {
+    let mesh = truck_meshes::triangle();
+    truck_meshes::write_polygon_mesh(&mesh, "output/triangle.obj");
 }
 ```
 
-This program constructs:
-
-- 3 vertices
-- 1 triangular face
-- an OBJ file named `triangle.obj`
-
-## Run the program
-
-From your project directory, run:
-
-```bash
-cargo run
-```
-
-If everything works, you will see a new file: `triangle.obj`. This uses the Wavefront OBJ format, which is widely supported and easy to view.
-
-## Viewing the triangle
-
-Most operating systems include a built-in OBJ viewer:
-
-- Windows: 3D Viewer
-- macOS: Preview
-
-Both are fine for quick checks but limited for edge display and advanced visualization.
-
-### A better viewer (recommended)
-
-[ParaView](https://www.paraview.org/) offers:
-
-- edge display
-- surface shading
-- advanced rendering
-- support for large meshes
-- scientific visualization features
+</details>

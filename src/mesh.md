@@ -19,18 +19,10 @@ Truck supports two broad categories for representing shapes:
 
 - **Polygon meshes**: great for rendering, simple geometric manipulation, and interoperability with game engines, viewers, and simulation tools. Truck uses a mesh format based on [Wavefront OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file), one of the easiest and most widely supported formats in 3D graphics.
 - **Boundary representations ([B-rep](https://en.wikipedia.org/wiki/Boundary_representation))**: describe shapes using curved surfaces (like [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)), edges, and [topology](https://en.wikipedia.org/wiki/Topology) information. They are powerful for CAD and engineering, but not directly friendly for GPUs.
-
+ 
 ## Converting shapes to meshes
 
-If you create a model using B-rep, [CSG](https://en.wikipedia.org/wiki/Constructive_solid_geometry), or another high-level representation, you usually need to convert it into a mesh before you can display it. This is normal—it's what almost every CAD or modeling program does behind the scenes.
-
-Truck includes tools (see [truck-meshalgo](https://github.com/ricosjp/truck/tree/master/truck-meshalgo)):
-
-- Generating meshes from other representations ([traits](https://doc.rust-lang.org/book/ch10-02-traits.html) like `MeshableShape`, `RobustMeshableShape`, `MeshedShape` in `src/tessellation/mod.rs`; example driver: `examples/tessellate-shape`)
-- Completing missing normals (`NormalFilters` in `src/filters/normal_filters.rs` with `add_naive_normals`, `add_smooth_normals`, `normalize_normals`, etc.)
-- Simplifying/filtering mesh data (`OptimizingFilter`, `StructuringFilter`, `Subdivision` in `src/filters/mod.rs` with implementations such as `optimizing.rs` for removing unused attrs/degenerate faces, unifying shared verts, subdividing, etc.)
-
-These operations make your meshes cleaner, smaller, and faster to render.
+If you create a model using B-rep, [CSG](https://en.wikipedia.org/wiki/Constructive_solid_geometry), or another high-level representation, you will eventually convert (tessellate) it into a mesh before rendering. The modeling chapter covers that tessellation step, and the normals/filters chapters show how to clean and optimize the resulting meshes for fast rendering.
 
 ## A note about non-mesh rendering
 

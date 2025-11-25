@@ -4,7 +4,7 @@ Welcome to Truck, a pure-Rust [CAD kernel](https://en.wikipedia.org/wiki/Geometr
 
 ## The three core ideas
 
-1. **Trendy tools**: [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)) for safety/performance; [WebGPU](https://en.wikipedia.org/wiki/WebGPU) for fast, cross-platform graphics and compute.
+1. **Trendy tools**: [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language)) for safety/performance; [WebGPU](https://en.wikipedia.org/wiki/WebGPU) via Rust's [three-d](https://github.com/asny/three-d) library for fast, cross-platform graphics and compute.
 2. **Traditional arts (modernized)**: Re-implements classic CAD concepts (B-rep, [NURBS](https://en.wikipedia.org/wiki/Non-uniform_rational_B-spline)) with [Rust](https://en.wikipedia.org/wiki/Rust_(programming_language))/[WebGPU](https://en.wikipedia.org/wiki/WebGPU) for stability and testability.
 3. **Modular Design ([Theseus’ Ship](https://en.wikipedia.org/wiki/Ship_of_Theseus))**: Small, replaceable crates so you can swap or evolve parts independently without breaking the whole system.
 
@@ -15,13 +15,6 @@ Welcome to Truck, a pure-Rust [CAD kernel](https://en.wikipedia.org/wiki/Geometr
 - **Contributors**: Contribute directly to Truck’s codebase.
 
 This tutorial focuses primarily on Users.
-
-## Sample code
-
-All examples live at [github.com/ricosjp/truck-tutorial-code/tree/v0.1](https://github.com/ricosjp/truck-tutorial-code/tree/v0.1)
-
-- `src/section2_1.rs` corresponds to Section 2.1 “First Triangle”.
-- Run with: `cargo run --bin section2_1`
 
 ## System requirements
 

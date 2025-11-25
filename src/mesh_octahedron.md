@@ -1,6 +1,8 @@
-# Hexahedron (Cube)
+# Octahedron
 
-## Add the hexahedron module
+Add an octahedron to the `truck_meshes` library (8 triangular faces), in its own file.
+
+## Add the octahedron module
 
 `src/lib.rs` additions:
 
@@ -8,21 +10,21 @@
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-// ...keep earlier functions: write_polygon_mesh, triangle, square, tetrahedron...
-pub mod hexahedron; //add this
-pub use hexahedron::hexahedron; //add this
+// ...keep earlier functions: write_polygon_mesh, triangle, square, tetrahedron, hexahedron...
+pub mod octahedron;
+pub use octahedron::octahedron;
 ```
 
 ## Construct Main Function
 
-`src/hexahedron.rs`:
+`src/octahedron.rs`:
 
 ```rust
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-/// Unit cube (hexahedron) using quads.
-pub fn hexahedron() -> PolygonMesh {
+/// Octahedron with vertices on the coordinate axes.
+pub fn octahedron() -> PolygonMesh {
 
     //PLACE STEP 1-4 HERE
 
@@ -32,14 +34,12 @@ pub fn hexahedron() -> PolygonMesh {
 #### Step 1: Define vertex positions
 ```rust
     let positions = vec![
-        Point3::new(0.0, 0.0, 0.0),
-        Point3::new(1.0, 0.0, 0.0),
-        Point3::new(1.0, 1.0, 0.0),
-        Point3::new(0.0, 1.0, 0.0),
-        Point3::new(0.0, 0.0, 1.0),
-        Point3::new(1.0, 0.0, 1.0),
-        Point3::new(1.0, 1.0, 1.0),
-        Point3::new(0.0, 1.0, 1.0),
+        Point3::new(-1.0, 0.0, 0.0), // -X
+        Point3::new(1.0, 0.0, 0.0),  // +X
+        Point3::new(0.0, -1.0, 0.0), // -Y
+        Point3::new(0.0, 1.0, 0.0),  // +Y
+        Point3::new(0.0, 0.0, -1.0), // -Z
+        Point3::new(0.0, 0.0, 1.0),  // +Z
     ];
 ```
 #### Step 2: Build attribute set
@@ -52,38 +52,36 @@ pub fn hexahedron() -> PolygonMesh {
 #### Step 3: Define mesh faces
 ```rust
     let faces = Faces::from_iter([
-        [3, 2, 1, 0], // bottom
-        [0, 1, 5, 4], // front
-        [1, 2, 6, 5], // right
-        [2, 3, 7, 6], // back
-        [3, 0, 4, 7], // left
-        [4, 5, 6, 7], // top
+        [0, 4, 2],
+        [2, 4, 1],
+        [1, 4, 3],
+        [3, 4, 0],
+        [0, 2, 5],
+        [2, 1, 5],
+        [1, 3, 5],
+        [3, 0, 5],
     ]);
 ```
-
-![Cube illustration](images/cube.svg)
-
-
 #### Step 4: Construct the mesh
 ```rust
     PolygonMesh::new(attrs, faces)
 ```
 
-## Export the cube
+## Export the octahedron
 
-Add `examples/hexahedron.rs`:
+Add `examples/octahedron.rs`:
 
 ```rust
 fn main() {
-    let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "output/cube.obj");
+    let mesh = truck_meshes::octahedron();
+    truck_meshes::write_polygon_mesh(&mesh, "output/octahedron.obj");
 }
 ```
 
 Run it:
 
 ```bash
-cargo run --example hexahedron
+cargo run --example octahedron
 ```
 
 <details>
@@ -97,13 +95,15 @@ truck_meshes/
 │  ├─ triangle.rs
 │  ├─ square.rs
 │  ├─ tetrahedron.rs
-│  └─ hexahedron.rs
+│  ├─ hexahedron.rs
+│  └─ octahedron.rs
 ├─ examples/
 │  ├─ triangle.rs
 │  ├─ square.rs
 │  ├─ tetrahedron.rs
-│  └─ hexahedron.rs
-└─ output/          # exported OBJ files (e.g., output/cube.obj)
+│  ├─ hexahedron.rs
+│  └─ octahedron.rs
+└─ output/          # exported OBJ files (e.g., output/octahedron.obj)
 ```
 
 </details>
@@ -134,24 +134,25 @@ pub use tetrahedron::tetrahedron;
 
 pub mod hexahedron;
 pub use hexahedron::hexahedron;
+
+pub mod octahedron;
+pub use octahedron::octahedron;
 ```
 
-`src/hexahedron.rs`:
+`src/octahedron.rs`:
 
 ```rust
 use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
-pub fn hexahedron() -> PolygonMesh {
+pub fn octahedron() -> PolygonMesh {
     let positions = vec![
-        Point3::new(0.0, 0.0, 0.0),
+        Point3::new(-1.0, 0.0, 0.0),
         Point3::new(1.0, 0.0, 0.0),
-        Point3::new(1.0, 1.0, 0.0),
+        Point3::new(0.0, -1.0, 0.0),
         Point3::new(0.0, 1.0, 0.0),
+        Point3::new(0.0, 0.0, -1.0),
         Point3::new(0.0, 0.0, 1.0),
-        Point3::new(1.0, 0.0, 1.0),
-        Point3::new(1.0, 1.0, 1.0),
-        Point3::new(0.0, 1.0, 1.0),
     ];
 
     let attrs = StandardAttributes {
@@ -160,24 +161,26 @@ pub fn hexahedron() -> PolygonMesh {
     };
 
     let faces = Faces::from_iter([
-        [3, 2, 1, 0],
-        [0, 1, 5, 4],
-        [1, 2, 6, 5],
-        [2, 3, 7, 6],
-        [3, 0, 4, 7],
-        [4, 5, 6, 7],
+        [0, 4, 2],
+        [2, 4, 1],
+        [1, 4, 3],
+        [3, 4, 0],
+        [0, 2, 5],
+        [2, 1, 5],
+        [1, 3, 5],
+        [3, 0, 5],
     ]);
 
     PolygonMesh::new(attrs, faces)
 }
 ```
 
-`examples/hexahedron.rs`:
+`examples/octahedron.rs`:
 
 ```rust
 fn main() {
-    let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "output/cube.obj");
+    let mesh = truck_meshes::octahedron();
+    truck_meshes::write_polygon_mesh(&mesh, "output/octahedron.obj");
 }
 ```
 

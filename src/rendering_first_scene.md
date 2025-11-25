@@ -1,106 +1,98 @@
-# First Scene
+# Render a Mesh
 
-Load a teapot OBJ, build a camera/light/model scene, and render it with truck-platform + truck-rendimpl.
+Load a Truck-generated OBJ, set up a camera and a couple of lights, and render it with three-d.
 
-## Imports and app skeleton
+Make sure your `Cargo.toml` includes these three-d crates:
 
-Reuse `app.rs` from the previous section.
-
-```rust
-mod app;
-use app::*;
-
-use std::sync::Arc;
-use truck_platform::*;     // GPU abstraction + scene graph
-use truck_rendimpl::*;     // renderer implementation
-use winit::window::Window;
+```toml
+three-d = { version = "0.18.2", features = ["window"] }
+three-d-asset = { version = "0.9", features = ["obj"] }
 ```
 
-Application with a `WindowScene`:
+## Imports and main
+
+Start with the empty window example, then add the pieces below in this order:
+
+- Keep the same `main` and `window` setup (no unwrap on `gl()`).
+- After grabbing `context`, insert the `Camera::new_perspective` setup.
+- Right after the camera, insert the directional and ambient lights.
+- After the lights, load the OBJ into `cpu_mesh`, compute normals, and build `model`.
+- Inside `render_loop`, keep `set_viewport(frame_input.viewport)` and render the model with both lights.
+
+Full listing for reference:
 
 ```rust
-struct MyApp {
-    scene: WindowScene,
-}
-
-#[async_trait(?Send)]
-impl App for MyApp {
-    async fn init(window: Arc<Window>) -> Self {
-        // build scene
-        MyApp { scene }
-    }
-
-    fn render(&mut self, frame: &SwapChainFrame) {
-        self.scene.render_scene(&frame.output.view);
-    }
-}
+use three_d::*;
 
 fn main() {
-    MyApp::run()
+    let window = Window::new(WindowSettings {
+        title: "Truck mesh with three-d".into(),
+        ..Default::default()
+    })
+    .unwrap();
+    let context = window.gl();
+
+    // Basic camera
+    let mut camera = Camera::new_perspective(
+        window.viewport(),
+        vec3(5.0, 4.0, 5.0),
+        vec3(0.0, 1.0, 0.0),
+        vec3(0.0, 1.0, 0.0),
+        degrees(55.0),
+        0.1,
+        50.0,
+    );
+
+    // White headlight + gentle fill
+    let light_primary =
+        DirectionalLight::new(&context, 1.0, Color::WHITE, &vec3(1.0, -1.0, -1.0)).unwrap();
+    let light_fill = AmbientLight::new(&context, 0.2, Color::WHITE);
+
+    // Load an OBJ exported from Truck (e.g., teapot.obj or cube.obj).
+    let path = "output/mesh.obj";
+    let mut cpu_mesh: three_d_asset::Mesh = three_d_asset::io::load(path)
+        .expect("failed to read OBJ")
+        .deserialize()
+        .expect("no mesh in OBJ");
+    cpu_mesh.compute_normals(); // ensure shading is smooth even if OBJ lacks normals
+
+    let mut model = Model::new_with_material(
+        &context,
+        &cpu_mesh,
+        PhysicalMaterial {
+            albedo: Color::new_opaque(200, 200, 200),
+            roughness: 0.35,
+            metallic: 0.05,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+
+    window.render_loop(move |frame_input| {
+        camera.set_viewport(frame_input.viewport);
+        let screen = frame_input.screen();
+
+        screen
+            .render(
+                ClearState::color_and_depth(0.06, 0.06, 0.08, 1.0, 1.0),
+                |renderer| {
+                    model.render(renderer, &camera, &[&light_primary, &light_fill]);
+                    Ok(())
+                },
+            )
+            .unwrap();
+
+        FrameOutput::default()
+    });
 }
 ```
 
-## Build the scene (inside `init`)
-
-### Camera
-
-```rust
-let mut camera = Camera::default();
-camera.matrix = Matrix4::look_at(
-    Point3::new(5.0, 6.0, 5.0),  // eye
-    Point3::new(0.0, 1.5, 0.0),  // target
-    Vector3::unit_y(),           // up
-)
-.invert()
-.unwrap(); // cgmath -> world-space transform
-```
-
-### Light
-
-```rust
-let mut light = Light::default();
-light.position = camera.position(); // simple headlight
-```
-
-### Scene descriptor
-
-```rust
-let scene_desc = WindowSceneDescriptor {
-    studio: StudioConfig {
-        camera,
-        lights: vec![light],
-        ..Default::default()
-    },
-    ..Default::default()
-};
-
-let mut scene = WindowScene::from_window(window, &scene_desc).await;
-```
-
-## Load and add the teapot
-
-Place `teapot.obj` in `src/`, then:
-
-```rust
-let polygon: PolygonMesh =
-    polymesh::obj::read(include_bytes!("teapot.obj").as_ref()).unwrap();
-
-let instance = scene.create_instance(&polygon, &Default::default());
-scene.add_object(&instance);
-```
-
-Instancing lets multiple objects share GPU mesh data.
-
-## Return the app
-
-```rust
-MyApp { scene }
-```
+Replace `"output/mesh.obj"` with any OBJ generated in previous chapters. The normals step ensures shading looks correct even if the OBJ didn’t include them.
 
 ## Run
 
 ```bash
-cargo run
+cargo run --bin viewer
 ```
 
-You should see a lit, shaded 3D teapot. Key pipeline steps: configure camera/light, build `WindowScene`, load OBJ → GPU instance, render each frame with `scene.render_scene(...)`.
+A lit, shaded version of your mesh should appear immediately.
