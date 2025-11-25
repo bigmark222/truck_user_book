@@ -1,9 +1,16 @@
 # Cylinder (rotational + planar + translational sweep)
 
+Keep the geometry and exports inside the library crate (mirroring the cube and torus pages) so binaries stay tiny.
+
+## Cylinder in `src/shapes/cylinder.rs`
+
 ```rust
 use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
 
-fn cylinder() -> Solid {
+/// Build a solid cylinder: rotational sweep → planar face → translational sweep.
+pub fn cylinder() -> Solid {
     // Start with a vertex on the base circle
     let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
 
@@ -22,39 +29,66 @@ fn cylinder() -> Solid {
     // Extrude the disk along +Z to make a solid
     builder::tsweep(&disk, 2.0 * Vector3::unit_z())
 }
+
+/// Triangulate and write an OBJ mesh.
+pub fn save_cylinder_obj(solid: &Solid, path: &str) {
+    let mesh_with_topology = solid.triangulation(0.01); // tolerance
+    let mesh = mesh_with_topology.to_polygon();
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+}
+
+/// Export the exact cylinder B-rep to STEP.
+pub fn save_cylinder_step(solid: &Solid, path: &str) {
+    let compressed = solid.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(path, display.to_string()).unwrap();
+}
 ```
 
-Steps:
+Steps inside `cylinder()`:
 
 1. Vertex at `(0, 0, -1)`.
 2. `rsweep` around +Z to form a circular wire (base).
 3. `try_attach_plane` closes the wire into a planar disk (face). Returns an error if the wire isn’t closed/planar.
 4. `tsweep` the disk 2 units along +Z to create the solid cylinder.
 
-## Save the cylinder (OBJ + STEP)
+## Expose the cylinder module through lib.rs
+
+**src/lib.rs**
 
 ```rust
-use truck_meshalgo::prelude::*;
-use truck_stepio::{CompleteStepDisplay, StepModel};
+pub mod shapes;
+pub use shapes::{
+    cube, save_obj, save_step, torus, save_torus_obj, save_torus_step,
+    cylinder, save_cylinder_obj, save_cylinder_step,
+};
+```
 
-fn save_shape(solid: &Solid, name: &str) {
-    // Mesh + OBJ
-    let mesh_with_topology = solid.triangulation(0.01); // tolerance
-    let mesh = mesh_with_topology.to_polygon();
-    let mut obj = std::fs::File::create(format!("output/{name}.obj")).unwrap();
-    obj::write(&mesh, &mut obj).unwrap();
+**src/shapes/mod.rs**
 
-    // STEP (exact B-rep)
-    let compressed = solid.compress();
-    let display = CompleteStepDisplay::new(
-        StepModel::from(&compressed),
-        Default::default(),
-    );
-    std::fs::write(format!("output/{name}.step"), display.to_string()).unwrap();
-}
+```rust
+pub mod cube;
+pub mod torus;
+pub mod cylinder;
 
+pub use cube::{cube, save_obj, save_step};
+pub use torus::{torus, save_torus_obj, save_torus_step};
+pub use cylinder::{cylinder, save_cylinder_obj, save_cylinder_step};
+```
+
+## Main entry point (bin)
+
+`src/bin/cylinder.rs` stays tiny and calls into the library:
+
+```rust
 fn main() {
-    save_shape(&cylinder(), "cylinder");
+    let cylinder = truck_brep::cylinder();
+    truck_brep::save_cylinder_obj(&cylinder, "output/cylinder.obj");
+    truck_brep::save_cylinder_step(&cylinder, "output/cylinder.step");
 }
 ```
 
@@ -82,47 +116,6 @@ truck_brep/
 │     ├─ torus.rs
 │     └─ cylinder.rs      # calls into lib
 └─ output/                # cylinder.obj, cylinder.step
-```
-
-</details>
-
-<details>
-<summary>Complete code (src/bin/cylinder.rs)</summary>
-
-```rust
-use truck_modeling::prelude::*;
-use truck_meshalgo::prelude::*;
-use truck_stepio::{CompleteStepDisplay, StepModel};
-
-fn cylinder() -> Solid {
-    let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
-    let circle: Wire = builder::rsweep(
-        &vertex,
-        Point3::new(0.0, 1.0, -1.0),
-        Vector3::unit_z(),
-        Rad(7.0),
-    );
-    let disk: Face = builder::try_attach_plane(&vec![circle]).expect("cannot attach plane");
-    builder::tsweep(&disk, 2.0 * Vector3::unit_z())
-}
-
-fn save_shape(solid: &Solid, name: &str) {
-    let mesh_with_topology = solid.triangulation(0.01);
-    let mesh = mesh_with_topology.to_polygon();
-    let mut obj = std::fs::File::create(format!("output/{name}.obj")).unwrap();
-    obj::write(&mesh, &mut obj).unwrap();
-
-    let compressed = solid.compress();
-    let display = CompleteStepDisplay::new(
-        StepModel::from(&compressed),
-        Default::default(),
-    );
-    std::fs::write(format!("output/{name}.step"), display.to_string()).unwrap();
-}
-
-fn main() {
-    save_shape(&cylinder(), "cylinder");
-}
 ```
 
 </details>
