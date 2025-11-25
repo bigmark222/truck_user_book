@@ -1,4 +1,4 @@
-## Cylinder (rotational + planar + translational sweep)
+# Cylinder (rotational + planar + translational sweep)
 
 ```rust
 use truck_modeling::prelude::*;
