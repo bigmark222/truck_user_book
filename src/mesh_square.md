@@ -35,20 +35,24 @@ pub fn square() -> PolygonMesh {
 #### Step 1: Define vertex positions
 ```rust
     let positions = vec![
-        Point3::new(0.0, 0.0, 0.0), // bottom-left
-        Point3::new(1.0, 0.0, 0.0), // bottom-right
-        Point3::new(1.0, 1.0, 0.0), // top-right
-        Point3::new(0.0, 1.0, 0.0), // top-left
+        Point3::new(0.0, 0.0, 0.0), // bottom-left [0]
+        Point3::new(1.0, 0.0, 0.0), // bottom-right [1]
+        Point3::new(1.0, 1.0, 0.0), // top-right [2]
+        Point3::new(0.0, 1.0, 0.0), // top-left [3]
     ];
 ```
+
 #### Step 2: Build attribute set
+
 ```rust
     let attrs = StandardAttributes {
         positions,
         ..Default::default()
     };
 ```
+
 #### Step 3: Define mesh faces
+
 ```rust
     let faces = Faces::from_iter([
         [0, 1, 2], // bottom-right triangle
@@ -63,6 +67,7 @@ Prefer a single quad? Swap the faces line in Step 3 for:
 ```
 
 #### Step 4: Construct the mesh
+
 ```rust
     PolygonMesh::new(attrs, faces)
 ```
@@ -83,6 +88,14 @@ Run it:
 ```bash
 cargo run --example square
 ```
+
+## View it
+
+Open `output/square.obj` in Preview/3D Viewer/ParaView/Blender. You should see a single square.
+
+*Image below from Preview (mac).*
+
+![Square](images/square.png)
 
 <details>
 <summary>File tree after this step</summary>

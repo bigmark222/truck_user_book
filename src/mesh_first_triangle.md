@@ -18,6 +18,25 @@ pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
 pub mod triangle; //add this
 pub use triangle::triangle; //add this
 ```
+
+<details>
+  <summary>Explanation of <code>pub mod</code> and <code>pub use</code></summary>
+
+  <strong><code>pub mod triangle;</code></strong>
+  <ul>
+    <li><code>mod triangle;</code> loads the <code>triangle.rs</code> file as a <a href="https://doc.rust-lang.org/rust-by-example/mod.html">module</a>
+ in the crate.</li>
+    <li>Making it <code>pub</code> exposes that module so other files or external <a href="https://doc.rust-lang.org/rust-by-example/crates.html">crate</a>
+ can access its contents.</li>
+  </ul>
+
+  <strong><code>pub use triangle::triangle;</code></strong>
+  <ul>
+    <li><code>use triangle::triangle;</code> imports the <code>triangle()</code> function into the crate root.</li>
+    <li>Making it <code>pub</code> re-exports the function so users can call <code>truck_meshes::triangle()</code> without the module <a href="https://en.wikipedia.org/wiki/Path_(computing)">path</a>.</li>
+  </ul>
+</details>
+
 ## Construct Main Function
 
 `src/triangle.rs`:
