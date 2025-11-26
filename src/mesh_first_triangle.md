@@ -33,18 +33,20 @@ pub fn triangle() -> PolygonMesh {
 
 }
 ```
+
 #### Step 1: Define vertex positions
+
 ```rust
     let positions = vec![
-        Point3::new(0.0, 0.0, 0.0),
-        Point3::new(1.0, 0.0, 0.0),
-        Point3::new(0.5, f64::sqrt(3.0) / 2.0, 0.0),
+        Point3::new(0.0, 0.0, 0.0), //vertex index: 0
+        Point3::new(1.0, 0.0, 0.0), //vertex index: 1
+        Point3::new(0.5, f64::sqrt(3.0) / 2.0, 0.0), //vertex index: 2
     ];
 ```
 <details>
 <summary>Explanation</summary>
 
-Create three `Point3` coordinates that form an equilateral triangle on the XY plane. Two points sit on the X axis at y = 0, and the third is lifted to `sqrt(3)/2` so all sides are length 1. These positions are the raw vertex data the mesh will consume.
+Create three `Point3` coordinates that form an equilateral triangle on the XY plane. Two points sit on the X axis at y = 0, and the third is centered at `x = 0.5` (midway between the base points) with `y = sqrt(3)/2` so all sides are length 1. These positions are the raw vertex data the mesh will consume.
 
 </details>
 
@@ -59,7 +61,7 @@ Create three `Point3` coordinates that form an equilateral triangle on the XY pl
 <details>
 <summary>Explanation</summary>
 
-Wrap the vertex positions into the `StandardAttributes` container, which is where meshes expect per-vertex data (positions, normals, UVs, etc.). We only set positions and leave every other attribute at its default.
+Store the vertex positions in the [`StandardAttributes`](https://docs.rs/truck-polymesh/latest/truck_polymesh/struct.StandardAttribute.html) struct, which is where a mesh stores all vertex-level attributes (positions, [normals](https://en.wikipedia.org/wiki/Normal_(geometry)), [UVs](https://en.wikipedia.org/wiki/UV_mapping), etc.). We will only set `positions`, and leave every other attribute at its default.
 
 </details>
 
@@ -71,7 +73,19 @@ Wrap the vertex positions into the `StandardAttributes` container, which is wher
 <details>
 <summary>Explanation</summary>
 
-Specify the triangle’s topology by listing vertex indices. The single face references vertices 0, 1, and 2 in counter-clockwise order, which sets the face normal to point along +Z.
+Define the triangle by listing the indices of its three vertices. Their counter-clockwise order (0 → 1 → 2) sets the **face orientation**, marking the triangle’s front side as facing the +Z direction.
+
+</details>
+
+<details>
+<summary><strong>Face orientation (important)</strong></summary>
+
+- CCW order (counter-clockwise) → face points toward you  
+- CW order (clockwise) → face points away  
+
+When looking at the outside, list triangle vertices counter-clockwise.
+
+![Triangle face winding order in Unity](images/winding-order=triangle-unity.png)
 
 </details>
 
@@ -84,7 +98,9 @@ Specify the triangle’s topology by listing vertex indices. The single face ref
 <details>
 <summary>Explanation</summary>
 
-Assemble the mesh by pairing the attribute data with the face list. The returned `PolygonMesh` is ready to render or export (e.g., via `write_polygon_mesh` to an OBJ file).
+Construct the mesh by passing the vertex attributes `attrs` and the face index list `faces` to `PolygonMesh::new`. Each face index (like `[0, 1, 2]`) points into the attribute array, telling the mesh which positions belong to that face. 
+
+The counter-clockwise order of these indices establishes the **face orientation**, which renderers use for lighting, [backface culling](https://en.wikipedia.org/wiki/Back-face_culling), and generating smooth shading. `PolygonMesh::new` combines these into a fully defined mesh ready for rendering or OBJ export.
 
 </details>
 
@@ -108,6 +124,10 @@ cargo run --example triangle
 ## View it
 
 Open `output/triangle.obj` in Preview/3D Viewer/ParaView/Blender. You should see a single triangle.
+
+*Image below from ParaView.*
+
+![Triangle](images/triangle.png)
 
 <details>
 <summary>File tree after this step</summary>

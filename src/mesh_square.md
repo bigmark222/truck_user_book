@@ -55,15 +55,16 @@ pub fn square() -> PolygonMesh {
         [0, 2, 3], // top-left triangle
     ]);
 ```
-#### Step 4: Construct the mesh
-```rust
-    PolygonMesh::new(attrs, faces)
-```
 
 Prefer a single quad? Swap the faces line in Step 3 for:
 
 ```rust
     let faces = Faces::from_iter([[0, 1, 2, 3]]);
+```
+
+#### Step 4: Construct the mesh
+```rust
+    PolygonMesh::new(attrs, faces)
 ```
 
 ## Export the square

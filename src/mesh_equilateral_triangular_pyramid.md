@@ -56,19 +56,8 @@ pub fn tetrahedron() -> PolygonMesh {
 ```
 ![Trigonal pyramid illustration](images/pyramid.svg)
 
-<details>
-<summary><strong>Face orientation (important)</strong></summary>
-
-- CCW order (counter-clockwise) → face points toward you  
-- CW order (clockwise) → face points away  
-
-When looking at the outside, list triangle vertices counter-clockwise.
-
-![Triangle face winding order in Unity](images/winding-order=triangle-unity.png)
-
-</details>
-
 #### Step 4: Construct the mesh
+
 ```rust
     PolygonMesh::new(attrs, faces)
 ```

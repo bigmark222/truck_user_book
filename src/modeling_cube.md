@@ -9,7 +9,7 @@ Add to `Cargo.toml`:
 ```toml
 [dependencies]
 truck-modeling = "0.6.0"   # B-rep modeling API
-truck-meshalgo = "0.6.0"   # Mesh conversion utilities
+truck-meshalgo = "0.4.0"   # Mesh conversion utilities
 truck-stepio  = "0.2.0"    # STEP export
 ```
 
