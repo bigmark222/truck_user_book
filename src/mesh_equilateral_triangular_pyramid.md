@@ -32,10 +32,10 @@ pub fn tetrahedron() -> PolygonMesh {
 #### Step 1: Define vertex positions
 ```rust
     let positions = vec![
-        Point3::new(0.0, 0.0, 0.0), // base 1
-        Point3::new(1.0, 0.0, 0.0), // base 2
-        Point3::new(0.5, f64::sqrt(3.0) / 2.0, 0.0), // base 3
-        Point3::new(0.5, f64::sqrt(3.0) / 6.0, f64::sqrt(6.0) / 3.0), // apex
+        Point3::new(0.0, 0.0, 0.0), // base 1 [0]
+        Point3::new(1.0, 0.0, 0.0), // base 2 [1]
+        Point3::new(0.5, f64::sqrt(3.0) / 2.0, 0.0), // base 3 [2]
+        Point3::new(0.5, f64::sqrt(3.0) / 6.0, f64::sqrt(6.0) / 3.0), // apex [3]
     ];
 ```
 #### Step 2: Build attribute set
@@ -73,11 +73,26 @@ fn main() {
 }
 ```
 
+<details>
+<summary>What does the `&` mean in `&mesh`?</summary>
+
+`write_polygon_mesh` expects a <a href="https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html">reference</a> to a `PolygonMesh`, so `&mesh` borrows the mesh instead of moving it. That lets the function read the mesh without taking <a href="https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html">ownership</a>, so you could keep using `mesh` afterward if needed.
+
+</details>
+
 Run it:
 
 ```bash
 cargo run --example tetrahedron
 ```
+
+## View it
+
+Open `output/tetrahedron.obj` in Preview/3D Viewer/ParaView/Blender. You should see a single tetrahedron.
+
+*gif below from Preview (mac).*
+
+![Tetrahedron](images/tetrahedron.gif)
 
 <details>
 <summary>File tree after this step</summary>
