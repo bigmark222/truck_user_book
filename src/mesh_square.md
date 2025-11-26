@@ -1,8 +1,8 @@
-# Square (Two Triangles)
+# Square
 
 Keep working in the same `truck_meshes` library so shapes can import each other, and place each shape in its own file.
 
-Reference code: same setup as [triangle](mesh_first_triangle.md), but with 4 vertices and 2 faces.
+Reference code: same setup as [triangle](mesh_first_triangle.md), but with 4 vertices.
 
 ## Add the square module
 
