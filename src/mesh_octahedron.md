@@ -1,7 +1,5 @@
 # Octahedron
 
-Add an octahedron to the `truck_meshes` library (8 triangular faces), in its own file.
-
 ## Add the octahedron module
 
 `src/lib.rs` additions:
@@ -11,8 +9,8 @@ use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 // ...keep earlier functions: write_polygon_mesh, triangle, square, tetrahedron, hexahedron...
-pub mod octahedron;
-pub use octahedron::octahedron;
+pub mod octahedron; // add this
+pub use octahedron::octahedron; // add this
 ```
 
 ## Construct Main Function
@@ -34,12 +32,12 @@ pub fn octahedron() -> PolygonMesh {
 #### Step 1: Define vertex positions
 ```rust
     let positions = vec![
-        Point3::new(-1.0, 0.0, 0.0), // -X
-        Point3::new(1.0, 0.0, 0.0),  // +X
-        Point3::new(0.0, -1.0, 0.0), // -Y
-        Point3::new(0.0, 1.0, 0.0),  // +Y
-        Point3::new(0.0, 0.0, -1.0), // -Z
-        Point3::new(0.0, 0.0, 1.0),  // +Z
+        Point3::new(-1.0, 0.0, 0.0), // (-X) [0]
+        Point3::new(1.0, 0.0, 0.0),  // (+X) [1]
+        Point3::new(0.0, -1.0, 0.0), // (-Y) [2]
+        Point3::new(0.0, 1.0, 0.0),  // (+Y) [3]
+        Point3::new(0.0, 0.0, -1.0), // (-Z) [4]
+        Point3::new(0.0, 0.0, 1.0),  // (+Z) [5]
     ];
 ```
 #### Step 2: Build attribute set
@@ -62,7 +60,9 @@ pub fn octahedron() -> PolygonMesh {
         [3, 0, 5],
     ]);
 ```
+
 #### Step 4: Construct the mesh
+
 ```rust
     PolygonMesh::new(attrs, faces)
 ```
@@ -83,6 +83,15 @@ Run it:
 ```bash
 cargo run --example octahedron
 ```
+
+## View it
+
+Open `output/octahedron.obj` in your preferred OBJ file viewer. You should see a single octahedron.
+
+*gif below from Bambu Studio.*
+
+![Octahedron](images/octahedron.gif)
+
 
 <details>
 <summary>File tree after this step</summary>
