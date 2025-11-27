@@ -32,24 +32,28 @@ pub fn hexahedron() -> PolygonMesh {
 #### Step 1: Define vertex positions
 ```rust
     let positions = vec![
-        Point3::new(0.0, 0.0, 0.0),
-        Point3::new(1.0, 0.0, 0.0),
-        Point3::new(1.0, 1.0, 0.0),
-        Point3::new(0.0, 1.0, 0.0),
-        Point3::new(0.0, 0.0, 1.0),
-        Point3::new(1.0, 0.0, 1.0),
-        Point3::new(1.0, 1.0, 1.0),
-        Point3::new(0.0, 1.0, 1.0),
+        Point3::new(0.0, 0.0, 0.0), //[0]
+        Point3::new(1.0, 0.0, 0.0), //[1]
+        Point3::new(1.0, 1.0, 0.0), //[2]
+        Point3::new(0.0, 1.0, 0.0), //[3]
+        Point3::new(0.0, 0.0, 1.0), //[4]
+        Point3::new(1.0, 0.0, 1.0), //[5]
+        Point3::new(1.0, 1.0, 1.0), //[6]
+        Point3::new(0.0, 1.0, 1.0), //[7]
     ];
 ```
+
 #### Step 2: Build attribute set
+
 ```rust
     let attrs = StandardAttributes {
         positions,
         ..Default::default()
     };
+
 ```
 #### Step 3: Define mesh faces
+
 ```rust
     let faces = Faces::from_iter([
         [3, 2, 1, 0], // bottom
@@ -65,6 +69,7 @@ pub fn hexahedron() -> PolygonMesh {
 
 
 #### Step 4: Construct the mesh
+
 ```rust
     PolygonMesh::new(attrs, faces)
 ```
@@ -76,7 +81,7 @@ Add `examples/hexahedron.rs`:
 ```rust
 fn main() {
     let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "output/cube.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/hexahedron.obj");
 }
 ```
 
@@ -85,6 +90,15 @@ Run it:
 ```bash
 cargo run --example hexahedron
 ```
+
+## View it
+
+Open `output/hexahedron.obj` in Preview/3D Viewer/ParaView/Blender. You should see a single hexahedron.
+
+*gif below from Preview (mac).*
+
+![Hexahedron](images/hexahedron.gif)
+
 
 <details>
 <summary>File tree after this step</summary>
@@ -103,7 +117,7 @@ truck_meshes/
 │  ├─ square.rs
 │  ├─ tetrahedron.rs
 │  └─ hexahedron.rs
-└─ output/          # exported OBJ files (e.g., output/cube.obj)
+└─ output/          # exported OBJ files (e.g., output/hexahedron.obj)
 ```
 
 </details>
@@ -177,7 +191,7 @@ pub fn hexahedron() -> PolygonMesh {
 ```rust
 fn main() {
     let mesh = truck_meshes::hexahedron();
-    truck_meshes::write_polygon_mesh(&mesh, "output/cube.obj");
+    truck_meshes::write_polygon_mesh(&mesh, "output/hexahedron.obj");
 }
 ```
 
