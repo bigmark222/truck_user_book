@@ -35,60 +35,62 @@ truck_meshes/
 truck_meshes/
 ├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs                    # lean: pub mod/pub use only
-│  ├─ utils/
-│  │  ├─ mod.rs                 # exports helpers
-│  │  └─ normal_helpers.rs      # normals helpers live here
-│  └─ shapes/                   # each shape in its own module
-│     ├─ mod.rs                 # exports shapes
-│     ├─ triangle.rs
-│     ├─ square.rs
-│     ├─ tetrahedron.rs
-│     ├─ hexahedron.rs
-│     ├─ octahedron.rs
-│     ├─ dodecahedron.rs
-│     └─ icosahedron.rs
-└─ examples/
-   ├─ shapes/                   # shape-only examples (per example folder with main.rs)
-   │  ├─ triangle/
-   │  │  └─ main.rs
-   │  ├─ square/
-   │  │  └─ main.rs
-   │  ├─ tetrahedron/
-   │  │  └─ main.rs
-   │  ├─ hexahedron/
-   │  │  └─ main.rs
-   │  ├─ octahedron/
-   │  │  └─ main.rs
-   │  ├─ dodecahedron/
-   │  │  └─ main.rs
-   │  └─ icosahedron/
-   │     └─ main.rs
-   └─ normals/                  # normals + filters walkthroughs
-      └─ icosahedron/
-         └─ main.rs
+│  ├─ lib.rs
+│  ├─ shapes/
+│  │  ├─ mod.rs
+│  │  ├─ triangle.rs
+│  │  ├─ square.rs
+│  │  ├─ tetrahedron.rs
+│  │  ├─ hexahedron.rs
+│  │  ├─ octahedron.rs
+│  │  ├─ dodecahedron.rs
+│  │  └─ icosahedron.rs
+│  └─ utils/
+│     ├─ mod.rs
+│     └─ normal_helpers.rs
+├─ examples/
+│  ├─ shapes/
+│  │  ├─ triangle/
+│  │  │  └─ main.rs
+│  │  ├─ square/
+│  │  │  └─ main.rs
+│  │  ├─ tetrahedron/
+│  │  │  └─ main.rs
+│  │  ├─ hexahedron/
+│  │  │  └─ main.rs
+│  │  ├─ octahedron/
+│  │  │  └─ main.rs
+│  │  ├─ dodecahedron/
+│  │  │  └─ main.rs
+│  │  └─ icosahedron/
+│  │     └─ main.rs
+│  └─ normals/
+│     
+│
+└─ output/          # exported OBJ files from examples
 ```
 
 ## How we’ll modularize (step by step)
 
-1) **Create folders**
+### 1) **Create new directories**
 
-- From the root directory of the project (`truck_user_book/`)
-    - Run:
+From the root directory of the project (`truck_user_book/`)
 
-    ```sh 
-    mkdir -p src/shapes src/utils examples/shapes examples/normals
-    ```
+- Run:
 
-2) **Move shape modules**
+```sh 
+mkdir -p src/shapes src/utils examples/shapes examples/normals
+```
 
-    - Run:
+### 2) **Move shape modules**
 
-    ```sh 
-    mv src/triangle.rs src/square.rs src/tetrahedron.rs src/hexahedron.rs src/octahedron.rs src/dodecahedron.rs src/icosahedron.rs src/shapes/
-    ```
+- Run:
 
-3) **Add `src/shapes/mod.rs`**
+```sh 
+mv src/triangle.rs src/square.rs src/tetrahedron.rs src/hexahedron.rs src/octahedron.rs src/dodecahedron.rs src/icosahedron.rs src/shapes/
+```
+
+### 3) **Add `src/shapes/mod.rs`**
 
 - In `src/shapes/mod.rs`, declare and re-export shapes:
 
@@ -116,93 +118,23 @@ pub use icosahedron::icosahedron;
 
 ```
 
-4) **Move normals helpers**
+### 4) **Add the files for the normals helper module and functions**
+
+*(we will insert the code for these on the next page)*
 
 - Add `src/utils/mod.rs`:
 
-```rust
-pub mod normal_helpers;
-pub use normal_helpers::{
-    compute_face_normals,
-    compute_vertex_normals,
-    add_face_normals,
-    add_vertex_normals,
-    normalize_vertex_normals,
-};
+```sh
+touch src/utils/mod.rs
 ```
 
-- Place the helper code in `src/utils/normal_helpers.rs`.
+- Add `src/utils/normal_helpers.rs`.
 
-```rust
-use truck_meshalgo::filters::NormalFilters;
-use truck_meshalgo::prelude::*;
+```sh 
+touch src/utils/normal_helpers.rs
 ```
 
-```rust
-/// Returns one normalized face normal per polygon.
-pub fn compute_face_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
-    let positions = mesh.positions();
-    mesh.face_iter()
-        .map(|face| {
-            if face.len() < 3 {
-                return Vector3::zero();
-            }
-            let p0 = positions[face[0].pos];
-            let p1 = positions[face[1].pos];
-            let p2 = positions[face[2].pos];
-            let n = (p1 - p0).cross(p2 - p0);
-            if n.magnitude2() < 1e-12 {
-                return Vector3::zero();
-            }
-            n.normalize()
-        })
-        .collect()
-}
-```
-
-```rust
-/// Returns one normalized vertex normal per vertex (averaged from faces).
-pub fn compute_vertex_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
-    let positions = mesh.positions();
-    let face_normals = compute_face_normals(mesh);
-
-    let mut vertex_normals = vec![Vector3::zero(); positions.len()];
-    for (face_idx, face) in mesh.face_iter().enumerate() {
-        let n = face_normals[face_idx];
-        for v in face {
-            vertex_normals[v.pos] += n;
-        }
-    }
-    for n in vertex_normals.iter_mut() {
-        *n = n.normalize();
-    }
-    vertex_normals
-}
-```
-
-```rust
-/// Computes and attaches face normals to the mesh.
-pub fn add_face_normals(mesh: &mut PolygonMesh) {
-    mesh.add_naive_normals(true);
-}
-```
-
-```rust
-/// Computes and attaches vertex normals to the mesh.
-pub fn add_vertex_normals(mesh: &mut PolygonMesh) {
-    mesh.add_smooth_normals(0.8, true);
-}
-```
-
-```rust
-/// Normalizes any existing vertex normals in-place.
-pub fn normalize_vertex_normals(mesh: &mut PolygonMesh) {
-    mesh.normalize_normals();
-}
-
-```
-
-5) **Slim `src/lib.rs`**
+### 5) **Slim `src/lib.rs`**
 
 - Keep it lean with modules + re-exports:
 
@@ -224,31 +156,20 @@ pub use shapes::{
     dodecahedron,
     icosahedron,
 };
-
-pub mod utils;
-pub use utils::normal_helpers::{
-    compute_face_normals,
-    compute_vertex_normals,
-    add_face_normals,
-    add_vertex_normals,
-    normalize_vertex_normals,
-};
 ```
 
-6) **Move examples**
+### 6) **Move examples**
 
-- Create per-example folders with `main.rs` entrypoints:
+- Create per-example folders, with which we will later populate with `main.rs` entrypoints:
 
 ```sh
 mkdir -p examples/shapes/{triangle,square,tetrahedron,hexahedron,octahedron,dodecahedron,icosahedron}
 ```
 
-```sh
-mkdir -p examples/normals/{icosahedron, sphere}
-```
-
 - Move each example into its folder as `main.rs`
-- (bash/zsh) version:
+
+<details>
+<summary>(bash/zsh) version:</summary>
 
 ```sh
 cd examples
@@ -266,7 +187,10 @@ icosahedron.rs     shapes/icosahedron/main.rs
 EOF
 ```
 
-- Fish shell version:
+</details>
+
+<details>
+<summary>Fish shell version:</summary>
 
 ```fish
 cd examples
@@ -285,11 +209,13 @@ for pair in \
 end
 ```
 
-- You don’t need to change the `use truck_meshes::triangle;` style imports in examples because `lib.rs` will keep re-exporting these symbols.
+</details>
 
-7) **Verify**
+<br>
 
-- Run `cargo check` (and `cargo test` if present) to confirm modules and examples still compile.
+#### On the next page, we’ll cover the normals helper functions, and how to wire them into our program.
+
+<br>
 
 <details>
 <summary>Final file tree (after modularization)</summary>
@@ -328,8 +254,8 @@ truck_meshes/
 │  │  └─ icosahedron/
 │  │     └─ main.rs
 │  └─ normals/
-│     └─ icosahedron/
-│        └─ main.rs
+│     
+│
 └─ output/          # exported OBJ files from examples
 ```
 
@@ -341,6 +267,13 @@ truck_meshes/
 `src/lib.rs`
 
 ```rust
+use truck_meshalgo::prelude::*;
+
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(mesh, &mut obj).unwrap();
+}
+
 pub mod shapes;
 pub use shapes::{
     triangle,
@@ -352,14 +285,6 @@ pub use shapes::{
     icosahedron,
 };
 
-pub mod utils;
-pub use utils::normal_helpers::{
-    compute_face_normals,
-    compute_vertex_normals,
-    add_face_normals,
-    add_vertex_normals,
-    normalize_vertex_normals,
-};
 ```
 
 `src/shapes/mod.rs`
@@ -385,80 +310,6 @@ pub use dodecahedron::dodecahedron;
 
 pub mod icosahedron;
 pub use icosahedron::icosahedron;
-```
-
-`src/utils/mod.rs`
-
-```rust
-pub mod normal_helpers;
-pub use normal_helpers::{
-    compute_face_normals,
-    compute_vertex_normals,
-    add_face_normals,
-    add_vertex_normals,
-    normalize_vertex_normals,
-};
-```
-
-`src/utils/normal_helpers.rs`
-
-```rust
-use truck_meshalgo::filters::NormalFilters;
-use truck_meshalgo::prelude::*;
-
-/// Returns one normalized face normal per polygon.
-pub fn compute_face_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
-    let positions = mesh.positions();
-    mesh.face_iter()
-        .map(|face| {
-            if face.len() < 3 {
-                return Vector3::zero();
-            }
-            let p0 = positions[face[0].pos];
-            let p1 = positions[face[1].pos];
-            let p2 = positions[face[2].pos];
-            let n = (p1 - p0).cross(p2 - p0);
-            if n.magnitude2() < 1e-12 {
-                return Vector3::zero();
-            }
-            n.normalize()
-        })
-        .collect()
-}
-
-/// Returns one normalized vertex normal per vertex (averaged from faces).
-pub fn compute_vertex_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
-    let positions = mesh.positions();
-    let face_normals = compute_face_normals(mesh);
-
-    let mut vertex_normals = vec![Vector3::zero(); positions.len()];
-    for (face_idx, face) in mesh.face_iter().enumerate() {
-        let n = face_normals[face_idx];
-        for v in face {
-            vertex_normals[v.pos] += n;
-        }
-    }
-    for n in vertex_normals.iter_mut() {
-        *n = n.normalize();
-    }
-    vertex_normals
-}
-
-/// Computes and attaches face normals to the mesh.
-pub fn add_face_normals(mesh: &mut PolygonMesh) {
-    mesh.add_naive_normals(true);
-}
-
-/// Computes and attaches vertex normals to the mesh.
-pub fn add_vertex_normals(mesh: &mut PolygonMesh) {
-    mesh.add_smooth_normals(0.8, true);
-}
-
-/// Normalizes any existing vertex normals in-place.
-pub fn normalize_vertex_normals(mesh: &mut PolygonMesh) {
-    mesh.normalize_normals();
-}
-
 ```
 
 </details>
