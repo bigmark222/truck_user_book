@@ -23,3 +23,6 @@ mdbook build
 - `src/`: chapter content (mesh, modeling, rendering)
 - `src/SUMMARY.md`: chapter ordering
 - `book/`: generated output (ignored by git)
+
+**For the full code, refer to the [truck_user_book_code](https://github.com/bigmark222/truck_user_book_code) repo.**
+*which is largely based off of work from [RICOS Co. Ltd.](https://github.com/ricosjp).*
