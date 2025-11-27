@@ -7,7 +7,6 @@
 `src/lib.rs` additions:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 // ...keep earlier functions through octahedron...
@@ -32,6 +31,7 @@ pub fn dodecahedron() -> PolygonMesh {
 ```
 
 #### Step 1: Define helper scalars and vertex positions
+
 ```rust
     let a = f64::sqrt(3.0) / 3.0; // half cube edge
     let l = 2.0 * a / (1.0 + f64::sqrt(5.0)); // half dodeca edge
@@ -60,6 +60,7 @@ pub fn dodecahedron() -> PolygonMesh {
         Point3::new(-l, 0.0, -d), // [19]
     ];
 ```
+
 <details>
 <summary>Explanation</summary>
 
@@ -77,6 +78,7 @@ The hexahedron’s edges act as diagonals of regular pentagons, so each dodecahe
 ```
 
 #### Step 3: Define mesh faces
+
 ```rust
     let faces = Faces::from_iter([
         [4, 14, 5, 17, 16],
@@ -93,10 +95,11 @@ The hexahedron’s edges act as diagonals of regular pentagons, so each dodecahe
         [3, 19, 0, 11, 10],
     ]);
 ```
+
 <details>
 <summary>Explanation</summary>
 
-Each line is one pentagonal face, listing which vertices to connect by their index in the `positions` list (e.g., `[4, 14, 5, 17, 16]` means positions 4→14→5→17→16). The vertices are ordered counter-clockwise as seen from outside the shape so the face normal points outward for correct lighting.
+Each line is one pentagonal face, listing which vertices to connect by their index in the `positions` list (e.g., `[4, 14, 5, 17, 16]` means positions 4→14→5→17→16).
 
 </details>
 
@@ -131,7 +134,6 @@ Open `output/dodecahedron.obj` in your preferred OBJ file viewer. You should see
 
 ![Dodecahedron](images/dodecahedron.gif)
 
-
 <details>
 <summary>File tree after this step</summary>
 
@@ -164,7 +166,6 @@ truck_meshes/
 `src/lib.rs`:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {

@@ -5,7 +5,6 @@
 `src/lib.rs` additions:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 // ...keep earlier functions: write_polygon_mesh, triangle, square, tetrahedron...
@@ -30,6 +29,7 @@ pub fn hexahedron() -> PolygonMesh {
 ```
 
 #### Step 1: Define vertex positions
+
 ```rust
     let positions = vec![
         Point3::new(0.0, 0.0, 0.0), //[0]
@@ -52,6 +52,7 @@ pub fn hexahedron() -> PolygonMesh {
     };
 
 ```
+
 #### Step 3: Define mesh faces
 
 ```rust
@@ -128,7 +129,6 @@ truck_meshes/
 `src/lib.rs`:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.

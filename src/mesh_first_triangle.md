@@ -6,7 +6,6 @@
 `src/lib.rs` (root exports + helper):
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
@@ -128,6 +127,8 @@ The counter-clockwise order of these indices establishes the **face orientation*
 Add a tiny example at `examples/triangle.rs`:
 
 ```rust
+
+
 fn main() {
     let mesh = truck_meshes::triangle();
     truck_meshes::write_polygon_mesh(&mesh, "output/triangle.obj");
@@ -170,7 +171,6 @@ truck_meshes/
 `src/lib.rs`:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {

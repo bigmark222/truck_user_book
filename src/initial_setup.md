@@ -30,7 +30,6 @@ truck-meshalgo = "0.4.0"
 Replace the default `src/lib.rs` contents from `cargo new` with this helper (`write_polygon_mesh`), then keep your module re-exports right under it as you add shapes throughout the chapter.
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
@@ -63,7 +62,6 @@ truck_meshes/
 <summary>Full code (`src/lib.rs`):</summary>
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.

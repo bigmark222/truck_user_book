@@ -5,7 +5,6 @@
 `src/lib.rs` additions:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 // ...keep `write_polygon_mesh`, `triangle()`, and `square()` above...
@@ -30,6 +29,7 @@ pub fn tetrahedron() -> PolygonMesh {
 ```
 
 #### Step 1: Define vertex positions
+
 ```rust
     let positions = vec![
         Point3::new(0.0, 0.0, 0.0), // base 1 [0]
@@ -38,14 +38,18 @@ pub fn tetrahedron() -> PolygonMesh {
         Point3::new(0.5, f64::sqrt(3.0) / 6.0, f64::sqrt(6.0) / 3.0), // apex [3]
     ];
 ```
+
 #### Step 2: Build attribute set
+
 ```rust
     let attrs = StandardAttributes {
         positions,
         ..Default::default()
     };
 ```
+
 #### Step 3: Define mesh faces
+
 ```rust
     let faces = Faces::from_iter([
         [2, 1, 0], // base
@@ -54,6 +58,7 @@ pub fn tetrahedron() -> PolygonMesh {
         [2, 0, 3], // side 3
     ]);
 ```
+
 ![Trigonal pyramid illustration](images/pyramid.svg)
 
 #### Step 4: Construct the mesh
@@ -120,7 +125,6 @@ truck_meshes/
 `src/lib.rs`:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.

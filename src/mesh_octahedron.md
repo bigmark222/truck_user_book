@@ -5,7 +5,6 @@
 `src/lib.rs` additions:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 // ...keep earlier functions: write_polygon_mesh, triangle, square, tetrahedron, hexahedron...
@@ -92,6 +91,7 @@ Open `output/octahedron.obj` in your preferred OBJ file viewer. You should see a
 
 ![Octahedron](images/octahedron.gif)
 
+*Note that Bambu Studio (forked from PrusaSlicer) only supports triangular meshes at the moment.*
 
 <details>
 <summary>File tree after this step</summary>
@@ -123,7 +123,6 @@ truck_meshes/
 `src/lib.rs`:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.

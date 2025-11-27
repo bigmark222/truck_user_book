@@ -9,13 +9,13 @@ Reference code: same setup as [triangle](mesh_first_triangle.md), but with 4 ver
 `src/lib.rs` additions:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 // ...keep `write_polygon_mesh` and `triangle()` above...
 pub mod square; // add this
 pub use square::square; // add this
 ```
+
 ## Construct Main Function
 
 `src/square.rs`:
@@ -121,7 +121,6 @@ truck_meshes/
 `src/lib.rs`:
 
 ```rust
-use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 /// Write any mesh to an OBJ file.
