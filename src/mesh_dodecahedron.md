@@ -1,7 +1,5 @@
 # Dodecahedron
 
-Add a dodecahedron to the `truck_meshes` library so the icosahedron can import it, with its own file.
-
 ![Cube in dodecahedron illustration](images/Cube_in_dodecahedron.jpg)
 
 ## Add the dodecahedron module
@@ -13,8 +11,8 @@ use std::iter::FromIterator;
 use truck_meshalgo::prelude::*;
 
 // ...keep earlier functions through octahedron...
-pub mod dodecahedron;
-pub use dodecahedron::dodecahedron;
+pub mod dodecahedron; // add this
+pub use dodecahedron::dodecahedron; // add this
 ```
 
 ## Construct Main Function
@@ -40,32 +38,32 @@ pub fn dodecahedron() -> PolygonMesh {
     let d = f64::sqrt(1.0 - l * l); // other coordinate by Pythagoras
 
     let positions = vec![
-        Point3::new(-a, -a, -a),
-        Point3::new(a, -a, -a),
-        Point3::new(a, a, -a),
-        Point3::new(-a, a, -a),
-        Point3::new(-a, -a, a),
-        Point3::new(a, -a, a),
-        Point3::new(a, a, a),
-        Point3::new(-a, a, a),
-        Point3::new(d, -l, 0.0),
-        Point3::new(d, l, 0.0),
-        Point3::new(-d, l, 0.0),
-        Point3::new(-d, -l, 0.0),
-        Point3::new(0.0, d, -l),
-        Point3::new(0.0, d, l),
-        Point3::new(0.0, -d, l),
-        Point3::new(0.0, -d, -l),
-        Point3::new(-l, 0.0, d),
-        Point3::new(l, 0.0, d),
-        Point3::new(l, 0.0, -d),
-        Point3::new(-l, 0.0, -d),
+        Point3::new(-a, -a, -a), // [0]
+        Point3::new(a, -a, -a), // [1]
+        Point3::new(a, a, -a), // [2]
+        Point3::new(-a, a, -a),// [3]
+        Point3::new(-a, -a, a), // [4]
+        Point3::new(a, -a, a), // [5]
+        Point3::new(a, a, a), // [6]
+        Point3::new(-a, a, a), // [7]
+        Point3::new(d, -l, 0.0), // [8]
+        Point3::new(d, l, 0.0), // [9]
+        Point3::new(-d, l, 0.0), // [10]
+        Point3::new(-d, -l, 0.0), // [11]
+        Point3::new(0.0, d, -l), // [12]
+        Point3::new(0.0, d, l), // [13]
+        Point3::new(0.0, -d, l), // [14]
+        Point3::new(0.0, -d, -l), // [15]
+        Point3::new(-l, 0.0, d), // [16]
+        Point3::new(l, 0.0, d), // [17]
+        Point3::new(l, 0.0, -d), // [18]
+        Point3::new(-l, 0.0, -d), // [19]
     ];
 ```
 <details>
 <summary>Explanation</summary>
 
-The hexahedron’s edges act as diagonals of regular pentagons, so each dodecahedron edge equals the cube edge divided by the golden ratio. The “roof” vertices have one coordinate at zero; solving the remaining coordinate with the Pythagorean theorem gives the helper scalars `a`, `l`, and `d` used for all 20 vertex positions.
+The hexahedron’s edges act as diagonals of regular pentagons, so each dodecahedron edge equals the cube edge divided by the <a href="https://en.wikipedia.org/wiki/Golden_ratio">golden ratio</a>. The “roof” vertices have one coordinate at zero; solving the remaining coordinate with the <a href="https://en.wikipedia.org/wiki/Pythagorean_theorem">Pythagorean theorum</a> gives the helper scalars `a`, `l`, and `d` used for all 20 vertex positions.
 
 </details>
 
