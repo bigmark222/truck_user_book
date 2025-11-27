@@ -123,6 +123,15 @@ Run it:
 cargo run --example dodecahedron
 ```
 
+## View it
+
+Open `output/dodecahedron.obj` in your preferred OBJ file viewer. You should see a single dodecahedron.
+
+*gif below from Preview (mac).*
+
+![Dodecahedron](images/dodecahedron.gif)
+
+
 <details>
 <summary>File tree after this step</summary>
 
