@@ -153,6 +153,14 @@ Run it:
 cargo run --example icosahedron
 ```
 
+## View it
+
+Open `output/icosahedron.obj` in your preferred OBJ file viewer. You should see a single icosahedron.
+
+*gif below from Bambu Studio.*
+
+![Icosahedron](images/icosahedron.gif)
+
 <details>
 <summary>File tree after this step</summary>
 
