@@ -3,6 +3,8 @@
 Shift from **polygon meshes** to precise **boundary representations (B-reps)**.  
 Although both meshes and B-reps use vertices, edges, and faces, they **describe geometry in completely different ways.**
 
+<br>
+
 **Meshes** approximate shape using flat pieces:
 
 - vertices → points  
@@ -10,6 +12,8 @@ Although both meshes and B-reps use vertices, edges, and faces, they **describe 
 - faces → flat polygons (usually triangles)
 
 A **mesh** sphere, cylinder, or fillet is always a **faceted approximation** (represented using many small flat faces).
+
+<br>
 
 **B-reps** store the *exact* analytic geometry of a solid:
 
