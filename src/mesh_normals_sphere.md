@@ -77,7 +77,7 @@ Pulls in the unit cube mesh from `hexahedron()` and recenters it so projecting t
 <details>
 <summary>What it does</summary>
 
-Samples each cube face on an `(i,j)` grid, bilinearly interpolates positions inside each quad, and normalizes every point to sit on the unit sphere.
+Samples each cube face on an `(i,j)` grid, [bilinearly interpolates](https://en.wikipedia.org/wiki/Bilinear_interpolation?utm_source=chatgpt.com) positions inside each quad, and normalizes every point to sit on the unit sphere.
 </details>
 
 #### Step 3: compute normals (just position → vector)
