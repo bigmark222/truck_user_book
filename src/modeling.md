@@ -7,9 +7,9 @@ Although both meshes and B-reps use vertices, edges, and faces, they **describe 
 
 **Meshes** approximate shape using flat pieces:
 
-- vertices → points  
-- edges → straight line segments  
-- faces → flat polygons (usually triangles)
+- **Vertices:** points in 3D space
+- **Edges:** straight line segments  
+- **Faces:** flat polygons (usually triangles)
 
 A **mesh** sphere, cylinder, or fillet is always a **faceted approximation** (represented using many small flat faces).
 
