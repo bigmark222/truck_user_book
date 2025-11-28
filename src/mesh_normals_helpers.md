@@ -1,13 +1,12 @@
-# Normal Helper Module
+# Normal Helper Modules
 
-Truck does not provide built-in utilities for computing mesh normals, so here are the helpers we add to keep normals correct across shapes and filters.
+Truck has normal filters, but no helper functions for manually computing face or vertex normals, so we provide our own utilities here.
 
 ## Implement Functions in `src/utils/normal_helpers.rs`
 
 ### Import dependencies
 
 ```rust
-use truck_meshalgo::filters::NormalFilters;
 use truck_meshalgo::prelude::*;
 ```
 
@@ -19,13 +18,16 @@ pub fn compute_face_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
     let positions = mesh.positions();
     mesh.face_iter()
         .map(|face| {
+            // Need at least three vertices to form a plane
             if face.len() < 3 {
                 return Vector3::zero();
             }
+            // First three positions define the face plane
             let p0 = positions[face[0].pos];
             let p1 = positions[face[1].pos];
             let p2 = positions[face[2].pos];
             let n = (p1 - p0).cross(p2 - p0);
+            // Skip degenerate/collinear faces
             if n.magnitude2() < 1e-12 {
                 return Vector3::zero();
             }
@@ -38,10 +40,11 @@ pub fn compute_face_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
 <details>
 <summary>What it does + example</summary>
 
-Computes one unit normal per face using the first three vertices. Degenerate faces return the zero vector so downstream code can decide how to handle them.
+Derives a normalized face normal from the first three vertices of each polygon. **Degenerate** (cannot form a valid surface) **or collinear** (vertices all lie on the same straight line.) **faces** yield `Vector3::zero()`, enabling later routines to detect and correct them.
 
+<b>Example</b>
 ```rust
-let mesh = build_mesh();
+let mut mesh = build_mesh();
 let face_normals = compute_face_normals(&mesh);
 mesh.attributes_mut().add_face_normals(face_normals);
 ```
@@ -58,10 +61,12 @@ pub fn compute_vertex_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
     let mut vertex_normals = vec![Vector3::zero(); positions.len()];
     for (face_idx, face) in mesh.face_iter().enumerate() {
         let n = face_normals[face_idx];
+        // Accumulate adjacent face normals onto each vertex
         for v in face {
             vertex_normals[v.pos] += n;
         }
     }
+    // Normalize summed vectors so each vertex normal is unit length
     for n in vertex_normals.iter_mut() {
         *n = n.normalize();
     }
@@ -72,64 +77,85 @@ pub fn compute_vertex_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
 <details>
 <summary>What it does + example</summary>
 
-Accumulates each face normal into its vertices, then normalizes per-vertex for smooth shading.
+Accumulates the face normals that touch each vertex and normalizes the sum so shared vertices shade smoothly across adjacent polygons.
+
+<b>Example</b>
 
 ```rust
-let mesh = load_mesh();
+let mut mesh = load_mesh();
 let vertex_normals = compute_vertex_normals(&mesh);
-let mut mesh = mesh;
 mesh.attributes_mut().add_vertex_normals(vertex_normals);
 ```
+
 </details>
 
 ### `add_face_normals`
 
 ```rust
-/// Computes and attaches face normals to the mesh.
+/// Computes and attaches a normal per face, wiring each vertex in the face to that normal.
 pub fn add_face_normals(mesh: &mut PolygonMesh) {
-    mesh.add_naive_normals(true);
+    let normals = compute_face_normals(mesh); // one normal per polygon
+    let editor = mesh.editor();
+    editor.attributes.normals = normals; // store normals into attributes
+    for (idx, face) in editor.faces.face_iter_mut().enumerate() {
+        for v in face.iter_mut() {
+            v.nor = Some(idx); // point each vertex's normal index to its face normal
+        }
+    }
 }
 ```
 
 <details>
 <summary>What it does + example</summary>
 
-Convenience wrapper that computes and writes per-face normals in-place.
+Computes per-face normals with `compute_face_normals` and wires each vertex in a face to that face's normal index.
 
+<b>Example</b>
 ```rust
-let mut mesh = build_mesh();
+let mut mesh = icosahedron();
 add_face_normals(&mut mesh);
-write_polygon_mesh(&mesh, "output/with-face-normals.obj");
+write_polygon_mesh(&mesh, "output/icosahedron_flat.obj");
 ```
 </details>
 
 ### `add_vertex_normals`
-
-```rust
-/// Computes and attaches vertex normals to the mesh.
+```rust 
+/// Computes and attaches a normal per vertex, wiring indices to match position indices.
 pub fn add_vertex_normals(mesh: &mut PolygonMesh) {
-    mesh.add_smooth_normals(0.8, true);
+    let normals = compute_vertex_normals(mesh); // smooth normals per vertex
+    let editor = mesh.editor();
+    editor.attributes.normals = normals; // store normals into attributes
+    for face in editor.faces.face_iter_mut() {
+        for v in face.iter_mut() {
+            v.nor = Some(v.pos); // normal index aligns with vertex position index
+        }
+    }
 }
 ```
 
 <details>
 <summary>What it does + example</summary>
 
-Computes smooth per-vertex normals and stores them on the mesh for shading/export.
+Computes smooth vertex normals using `compute_vertex_normals` and stores them so each vertex reuses its own normal index.
 
+<b>Example</b>
 ```rust
-let mut mesh = generate_mesh();
+let mut mesh = icosahedron();
 add_vertex_normals(&mut mesh);
-normalize_vertex_normals(&mut mesh); // optional cleanup
+write_polygon_mesh(&mesh, "output/icosahedron_smooth.obj");
 ```
 </details>
 
 ### `normalize_vertex_normals`
 
 ```rust
-/// Normalizes any existing vertex normals in-place.
+
+/// Normalizes any normals currently stored on the mesh in-place.
 pub fn normalize_vertex_normals(mesh: &mut PolygonMesh) {
-    mesh.normalize_normals();
+    let editor = mesh.editor();
+    for n in editor.attributes.normals.iter_mut() {
+        *n = n.normalize(); // keep direction, ensure unit length
+    }
 }
 
 ```
@@ -137,16 +163,18 @@ pub fn normalize_vertex_normals(mesh: &mut PolygonMesh) {
 <details>
 <summary>What it does + example</summary>
 
-Renormalizes existing vertex normals without changing direction; no-op if none exist.
+Renormalizes all stored normals in place, leaving their directions unchanged; if no normals exist, nothing happens.
 
+<b>Example</b>
 ```rust
 let mut mesh = mesh_with_normals();
-// ... edit or blend normals ...
+// ... edit or mix normals ...
 normalize_vertex_normals(&mut mesh);
 ```
 </details>
 
-### Add the following re-exports to `src/utils/mod.rs`:
+
+### Add the following re-exports to `src/utils/mod.rs`
 
 ```rust
 pub mod normal_helpers;
@@ -157,8 +185,10 @@ pub use normal_helpers::{
     add_vertex_normals,
     normalize_vertex_normals,
 };
+
 ```
-### Add ____ to src/lib.rs
+
+### Add the normal helpers re-exports to `src/lib.rs`
 
 ```rust
 pub mod utils;
@@ -171,7 +201,6 @@ pub use utils::normal_helpers::{
 };
 ```
 
-
 ## Verify everything works now with `cargo check`
 
 ### Run 
@@ -180,11 +209,11 @@ pub use utils::normal_helpers::{
 cargo check
 ```
 
-#### Next page, we will apply these functions to an Icosahedron.
+#### Next page, we will apply these functions to an Icosahedron
 
 
 <details>
-<summary>Project layout (modular)</summary>
+<summary>Directory layout (modular)</summary>
 
 ```
 truck_meshes/
@@ -203,39 +232,43 @@ truck_meshes/
 │  └─ utils/
 │     ├─ mod.rs
 │     └─ normal_helpers.rs
-└─ examples/
-   ├─ shapes/
-   │  ├─ triangle.rs
-   │  ├─ square.rs
-   │  ├─ tetrahedron.rs
-   │  ├─ hexahedron.rs
-   │  ├─ octahedron.rs
-   │  ├─ dodecahedron.rs
-   │  └─ icosahedron.rs
-   └─ normals/
-      └─ icosahedron.rs
+├─ examples/
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  ├─ hexahedron.rs
+│  ├─ octahedron.rs
+│  ├─ dodecahedron.rs
+│  └─ icosahedron.rs
+│  
+└─ output/          # exported OBJ files from examples
+
 ```
 </details>
 
 <details>
-<summary>Full `src/utils/normal_helpers.rs`</summary>
+<summary>Full code:</summary>
+
+`src/utils/normal_helpers.rs`
 
 ```rust
-use truck_polymesh::prelude::*;
+use truck_meshalgo::prelude::*;
 
 /// Returns one normalized face normal per polygon.
 pub fn compute_face_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
     let positions = mesh.positions();
-    mesh.faces()
-        .iter()
+    mesh.face_iter()
         .map(|face| {
+            // Need at least three vertices to form a plane
             if face.len() < 3 {
                 return Vector3::zero();
             }
-            let p0 = positions[face[0]];
-            let p1 = positions[face[1]];
-            let p2 = positions[face[2]];
+            // First three positions define the face plane
+            let p0 = positions[face[0].pos];
+            let p1 = positions[face[1].pos];
+            let p2 = positions[face[2].pos];
             let n = (p1 - p0).cross(p2 - p0);
+            // Skip degenerate/collinear faces
             if n.magnitude2() < 1e-12 {
                 return Vector3::zero();
             }
@@ -247,41 +280,101 @@ pub fn compute_face_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
 /// Returns one normalized vertex normal per vertex (averaged from faces).
 pub fn compute_vertex_normals(mesh: &PolygonMesh) -> Vec<Vector3> {
     let positions = mesh.positions();
-    let faces = mesh.faces();
     let face_normals = compute_face_normals(mesh);
 
     let mut vertex_normals = vec![Vector3::zero(); positions.len()];
-    for (face_idx, face) in faces.iter().enumerate() {
+    for (face_idx, face) in mesh.face_iter().enumerate() {
         let n = face_normals[face_idx];
-        for &v in face {
-            vertex_normals[v] += n;
+        // Accumulate adjacent face normals onto each vertex
+        for v in face {
+            vertex_normals[v.pos] += n;
         }
     }
+    // Normalize summed vectors so each vertex normal is unit length
     for n in vertex_normals.iter_mut() {
         *n = n.normalize();
     }
     vertex_normals
 }
 
-/// Computes and attaches face normals to the mesh.
+/// Computes and attaches a normal per face, wiring each vertex in the face to that normal.
 pub fn add_face_normals(mesh: &mut PolygonMesh) {
     let normals = compute_face_normals(mesh);
-    mesh.attributes_mut().add_face_normals(normals);
-}
-
-/// Computes and attaches vertex normals to the mesh.
-pub fn add_vertex_normals(mesh: &mut PolygonMesh) {
-    let normals = compute_vertex_normals(mesh);
-    mesh.attributes_mut().add_vertex_normals(normals);
-}
-
-/// Normalizes any existing vertex normals in-place.
-pub fn normalize_vertex_normals(mesh: &mut PolygonMesh) {
-    if let Some(normals) = mesh.attributes_mut().normal_mut() {
-        for n in normals.iter_mut() {
-            *n = n.normalize();
+    let editor = mesh.editor();
+    editor.attributes.normals = normals;
+    for (idx, face) in editor.faces.face_iter_mut().enumerate() {
+        for v in face.iter_mut() {
+            v.nor = Some(idx);
         }
     }
 }
+
+/// Computes and attaches a normal per vertex, wiring indices to match position indices.
+pub fn add_vertex_normals(mesh: &mut PolygonMesh) {
+    let normals = compute_vertex_normals(mesh);
+    let editor = mesh.editor();
+    editor.attributes.normals = normals;
+    for face in editor.faces.face_iter_mut() {
+        for v in face.iter_mut() {
+            v.nor = Some(v.pos);
+        }
+    }
+}
+
+/// Normalizes any normals currently stored on the mesh in-place.
+pub fn normalize_vertex_normals(mesh: &mut PolygonMesh) {
+    let editor = mesh.editor();
+    for n in editor.attributes.normals.iter_mut() {
+        *n = n.normalize();
+    }
+}
 ```
+
+`src/utils/mod.rs`
+
+```rust
+
+pub mod normal_helpers;
+pub use normal_helpers::{
+    compute_face_normals,
+    compute_vertex_normals,
+    add_face_normals,
+    add_vertex_normals,
+    normalize_vertex_normals,
+};
+```
+
+
+
+`src/lib.rs`
+
+```rust
+use truck_meshalgo::prelude::*;
+
+pub fn write_polygon_mesh(mesh: &PolygonMesh, path: &str) {
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(mesh, &mut obj).unwrap();
+}
+
+pub mod shapes;
+pub use shapes::{
+    triangle,
+    square,
+    tetrahedron,
+    hexahedron,
+    octahedron,
+    dodecahedron,
+    icosahedron,
+};
+
+pub mod utils;
+pub use utils::normal_helpers::{
+    compute_face_normals,
+    compute_vertex_normals,
+    add_face_normals,
+    add_vertex_normals,
+    normalize_vertex_normals,
+};
+```
+
 </details>

@@ -49,24 +49,14 @@ truck_meshes/
 │     ├─ mod.rs
 │     └─ normal_helpers.rs
 ├─ examples/
-│  ├─ shapes/
-│  │  ├─ triangle/
-│  │  │  └─ main.rs
-│  │  ├─ square/
-│  │  │  └─ main.rs
-│  │  ├─ tetrahedron/
-│  │  │  └─ main.rs
-│  │  ├─ hexahedron/
-│  │  │  └─ main.rs
-│  │  ├─ octahedron/
-│  │  │  └─ main.rs
-│  │  ├─ dodecahedron/
-│  │  │  └─ main.rs
-│  │  └─ icosahedron/
-│  │     └─ main.rs
-│  └─ normals/
-│     
-│
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  ├─ hexahedron.rs
+│  ├─ octahedron.rs
+│  ├─ dodecahedron.rs
+│  └─ icosahedron.rs
+│  
 └─ output/          # exported OBJ files from examples
 ```
 
@@ -79,7 +69,7 @@ From the root directory of the project (`truck_user_book/`)
 - Run:
 
 ```sh 
-mkdir -p src/shapes src/utils examples/shapes examples/normals
+mkdir -p src/shapes src/utils
 ```
 
 ### 2) **Move shape modules**
@@ -158,61 +148,6 @@ pub use shapes::{
 };
 ```
 
-### 6) **Move examples**
-
-- Create per-example folders, with which we will later populate with `main.rs` entrypoints:
-
-```sh
-mkdir -p examples/shapes/{triangle,square,tetrahedron,hexahedron,octahedron,dodecahedron,icosahedron}
-```
-
-- Move each example into its folder as `main.rs`
-
-<details>
-<summary>(bash/zsh) version:</summary>
-
-```sh
-cd examples
-while read -r src dst; do
-  mkdir -p "$(dirname "$dst")"
-  mv "$src" "$dst"
-done <<'EOF'
-triangle.rs        shapes/triangle/main.rs
-square.rs          shapes/square/main.rs
-tetrahedron.rs     shapes/tetrahedron/main.rs
-hexahedron.rs      shapes/hexahedron/main.rs
-octahedron.rs      shapes/octahedron/main.rs
-dodecahedron.rs    shapes/dodecahedron/main.rs
-icosahedron.rs     shapes/icosahedron/main.rs
-EOF
-```
-
-</details>
-
-<details>
-<summary>Fish shell version:</summary>
-
-```fish
-cd examples
-for pair in \
-  "triangle.rs shapes/triangle/main.rs" \
-  "square.rs shapes/square/main.rs" \
-  "tetrahedron.rs shapes/tetrahedron/main.rs" \
-  "hexahedron.rs shapes/hexahedron/main.rs" \
-  "octahedron.rs shapes/octahedron/main.rs" \
-  "dodecahedron.rs shapes/dodecahedron/main.rs" \
-  "icosahedron.rs shapes/icosahedron/main.rs"
-    set src (echo $pair | awk '{print $1}')
-    set dst (echo $pair | awk '{print $2}')
-    mkdir -p (dirname $dst)
-    mv $src $dst
-end
-```
-
-</details>
-
-<br>
-
 #### On the next page, we’ll cover the normals helper functions, and how to wire them into our program.
 
 <br>
@@ -238,24 +173,14 @@ truck_meshes/
 │     ├─ mod.rs
 │     └─ normal_helpers.rs
 ├─ examples/
-│  ├─ shapes/
-│  │  ├─ triangle/
-│  │  │  └─ main.rs
-│  │  ├─ square/
-│  │  │  └─ main.rs
-│  │  ├─ tetrahedron/
-│  │  │  └─ main.rs
-│  │  ├─ hexahedron/
-│  │  │  └─ main.rs
-│  │  ├─ octahedron/
-│  │  │  └─ main.rs
-│  │  ├─ dodecahedron/
-│  │  │  └─ main.rs
-│  │  └─ icosahedron/
-│  │     └─ main.rs
-│  └─ normals/
-│     
-│
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  ├─ hexahedron.rs
+│  ├─ octahedron.rs
+│  ├─ dodecahedron.rs
+│  └─ icosahedron.rs
+│  
 └─ output/          # exported OBJ files from examples
 ```
 

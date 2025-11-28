@@ -1,12 +1,12 @@
 # Normals - Icosahedron
 
-Apply the normal helper functions to the `icosahedron()` mesh so you can export both flat (per-face) and smooth (per-vertex) versions.
+Apply the normal helper functions to the `icosahedron` mesh so you can export both flat (per-face) and smooth (per-vertex) versions.
 
 Use the shared `write_polygon_mesh` helper from `lib.rs` to export OBJ files in these examples.
 
 ## Example: flat vs. smooth normals
 
-Create `examples/normals/icosahedron.rs`:
+Create `examples/normals_icosahedron.rs`:
 
 ```rust
 use truck_meshes::{
@@ -29,6 +29,7 @@ fn main() {
     normalize_vertex_normals(&mut smooth); // keep them unit length
     write_polygon_mesh(&smooth, "output/icosahedron_smooth.obj");
 }
+
 ```
 
 Run it and inspect both OBJ files in a viewer to see the difference in shading.
@@ -44,12 +45,18 @@ let face_normals = compute_face_normals(&mesh);     // len() == mesh.faces().len
 let vertex_normals = compute_vertex_normals(&mesh); // len() == mesh.positions().len()
 ```
 
-Use the face normals when you want a crisp, faceted icosahedron; use the vertex normals when you want a softer, smooth-shaded look.
+<br>
+
+#### Use the face normals when you want a crisp, faceted icosahedron; use the vertex normals when you want a softer, smooth-shaded look.
+
+## View it
+
+in my opinion, the contrast is clearest in [Blender](https://www.blender.org).
+
+![Icosahedron face vs vertex normals](images/face_vs_vertex_normals.png)
 
 <details>
 <summary>Updated directory layout</summary>
-
-After adding the writer helper and normals example:
 
 ```
 truck_meshes/
@@ -68,17 +75,15 @@ truck_meshes/
 │  └─ utils/
 │     ├─ mod.rs
 │     └─ normal_helpers.rs
-└─ examples/
-   ├─ shapes/
-   │  ├─ triangle.rs
-   │  ├─ square.rs
-   │  ├─ tetrahedron.rs
-   │  ├─ hexahedron.rs
-   │  ├─ octahedron.rs
-   │  ├─ dodecahedron.rs
-   │  └─ icosahedron.rs
-   └─ normals/
-      ├─ icosahedron.rs
-      └─ sphere.rs
+├─ examples/
+│  ├─ triangle.rs
+│  ├─ square.rs
+│  ├─ tetrahedron.rs
+│  ├─ hexahedron.rs
+│  ├─ octahedron.rs
+│  ├─ dodecahedron.rs
+│  ├─ icosahedron.rs
+│  └─ normals_icosahedron.rs
+└─ output/          # exported OBJ files from examples
 ```
 </details>

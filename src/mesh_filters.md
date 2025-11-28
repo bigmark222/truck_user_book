@@ -54,11 +54,19 @@ mesh.add_smooth_normals(1.0, true);
 write_polygon_mesh(&mesh, "output/mirror-ball-with-smooth-normal.obj");
 ```
 
+Normalize existing normals (keep direction, fix length):
+
+```rust
+// No-op if normals are absent
+mesh.normalize_normals();
+```
+
 ## When to use which
 
 - `put_together_same_attrs`: importing OBJ/patch models, fixing seams, removing duplicate geometry.
 - `add_naive_normals(true)`: sharp mechanical parts, crisp reflections, debugging face orientation.
 - `add_smooth_normals(angle, true)`: spheres or organic shapes needing soft shading.
+- `normalize_normals()`: after editing/importing normals to ensure they remain unit length without recomputing direction.
 
 ## Other cleanup passes
 
@@ -103,6 +111,7 @@ fn main() {
 
     // Smooth normals for softer shading
     mesh.add_smooth_normals(1.0, true); // ~57° crease angle
+    mesh.normalize_normals(); // keep normal lengths unit after any edits/imports
     write_polygon_mesh(&mesh, "output/mirror-ball-with-smooth-normal.obj");
 }
 ```
