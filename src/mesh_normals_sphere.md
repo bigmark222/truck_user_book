@@ -1,19 +1,12 @@
 # Normals - Sphere
 
-Vertex normals are what make a low-poly sphere look smooth instead of faceted. Here we’ll inflate a cube into a sphere, assign per-vertex normals, and export an OBJ.
-
-## Why vertex normals change the look
-
-- **Face normals only:** every quad or triangle shades independently; spheres look like mirror balls.
-- **Vertex normals:** store one normal per vertex, let the viewer interpolate across the surface; shading appears round.
-
-If a mesh ships without normals, viewers guess differently (Windows/ParaView use face normals; macOS averages adjacent faces). Providing normals removes that guesswork.
+Here we’ll inflate a cube into a sphere, assign per-vertex normals, and export an OBJ.
 
 ## Full example: cube → sphere with normals
 
-Reuse the shared `write_polygon_mesh` helper and `hexahedron()` shape from `lib.rs` to keep the sample lean:
+#### Reuse the shared `write_polygon_mesh` helper and `hexahedron()` shape from `lib.rs` to keep the sample lean:
 
-#### Create file `examples/normals_sphere.rs
+Create file `examples/normals_sphere.rs`
 
 ```rust
 use truck_meshalgo::prelude::*;
