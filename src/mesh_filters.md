@@ -89,6 +89,8 @@ Use the existing `write_polygon_mesh` helper to export OBJ files, then:
 cargo run
 ```
 
+![Sphere comparison](images/mirrorballs.gif)
+
 <details>
 <summary>Full example: filter a sphere OBJ (`examples/normals/filter_sphere.rs`)</summary>
 
@@ -115,6 +117,7 @@ fn main() {
     write_polygon_mesh(&mesh, "output/mirror-ball-with-smooth-normal.obj");
 }
 ```
+
 </details>
 
 <details>
