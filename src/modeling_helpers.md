@@ -1,8 +1,8 @@
-# B-rep Helper Module
+# B-rep Helper Functions
 
-Centralize OBJ/[STEP](https://en.wikipedia.org/wiki/ISO_10303-21) exports so shape modules only model geometry.
+Centralize OBJ/[STEP](https://en.wikipedia.org/wiki/ISO_10303-21) exports in `src/lib.rs` so shape modules (sibling files `cube.rs`, `torus.rs`, etc.) only model geometry.
 
-**src/helpers/mod.rs**
+**src/lib.rs** (helpers live here; shapes live as sibling files in `src/`)
 
 ```rust
 use truck_modeling::prelude::*;
@@ -103,35 +103,22 @@ pub fn save_obj(shape: &impl MeshedShape, path: &str) {
 
 </details>
 
-## Wire helpers into the crate
-
-Add the helpers module and re-export the functions at the crate root so binaries can simply call `truck_brep::save_obj` and `truck_brep::save_step_any`.
-
-**src/lib.rs**
-
-```rust
-pub mod helpers;
-pub mod shapes;
-
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::*;
-```
+<br>
+<br>
 
 <details>
 <summary>Directory tree</summary>
 
 ```
 truck_brep/
-├─ Cargo.toml
+├─ Cargo.toml      # add truck-modeling, truck-meshalgo, truck-stepio deps
 ├─ src/
-│  ├─ lib.rs
-│  ├─ helpers/
-│  │  └─ mod.rs
-│  └─ shapes/
-│     └─ mod.rs
+│  ├─ lib.rs       # helpers + re-exports
+│  └─              # add torus.rs, cylinder.rs, bottle.rs as you go
+│ 
 ├─ examples/
-│
-└─ output/
+│  └─              # calls truck_brep::cube(), etc.
+└─ output/         # generated OBJ/STEP files
 ```
 </details>
 
@@ -139,16 +126,6 @@ truck_brep/
 <summary>Complete code</summary>
 
 **src/lib.rs**
-
-```rust
-pub mod helpers;
-pub mod shapes;
-
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::*;
-```
-
-**src/helpers/mod.rs**
 
 ```rust
 use truck_modeling::prelude::*;

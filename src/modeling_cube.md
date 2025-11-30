@@ -14,7 +14,6 @@ Model a precise B-rep cube in Truck
   </ul>
 </details>
 
-
 ## Build a cube with `tsweep`
 
 <details>
@@ -31,12 +30,12 @@ Model a precise B-rep cube in Truck
   <p>A cube is built by sweeping three times along the X, Y, and Z directions.</p>
 </details>
 
-
-
-## Create file `src/shapes/cube.rs`:
+### `src/cube.rs`
 
 ```rust
 use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
 ```
 
 ```rust
@@ -49,11 +48,16 @@ pub fn cube() -> Solid {
 }
 ```
 
-### 1. Place the first vertex at `(-1, 0, -1)`.
+#### 1. Place the first vertex at `(-1, 0, -1)`.
 
 ```rust
   let vertex: Vertex = builder::vertex(Point3::new(-1.0, 0.0, -1.0));
 ```
+<details>
+<summary>what this code does</summary>
+
+`builder::vertex` lifts a raw point into a B-rep `Vertex`, giving us a manipulable geometric anchor for the sweeps that follow.
+</details>
 <details>
 <summary>visual</summary>
 
@@ -73,11 +77,18 @@ Point = (-1, 0, -1)
 
 </details>
 
-### 2. Sweep 2 units along +Z → edge.
+#### 2. Sweep 2 units along +Z → edge.
 
 ```rust
   let edge:   Edge   = builder::tsweep(&vertex, 2.0 * Vector3::unit_z());
 ```
+<details>
+<summary>what this code does</summary>
+
+`builder::tsweep` clones the vertex and moves the copy by `2.0 * +Z`—since `+Z` is the unit vector `(0, 0, 1)`, the translation is `(0, 0, 2)` (two units up the Z axis).  
+It then returns the **Edge** spanning between the original point and the shifted one.
+
+</details>
 
 <details>
 <summary>visual</summary>
@@ -97,11 +108,16 @@ This is the new Edge.
 
 </details>
 
-### 3. Sweep edge 2 units along +X → rectangular face.
+#### 3. Sweep edge 2 units along +X → rectangular face.
 
 ```rust
   let face:   Face   = builder::tsweep(&edge,   2.0 * Vector3::unit_x());
 ```
+<details>
+<summary>what this code does</summary>
+
+The edge is duplicated and shifted +X by 2.0; `tsweep` stitches the original and shifted edges into a ruled surface, yielding a rectangular `Face`.
+</details>
 
 <details>
 <summary>visual</summary>
@@ -121,11 +137,16 @@ That forms a rectangular Face.
 
 </details>
 
-### 4. Sweep face 2 units along +Y → solid cube.
+#### 4. Sweep face 2 units along +Y → solid cube.
 
 ```rust
   builder::tsweep(&face, 2.0 * Vector3::unit_y())
 ```
+<details>
+<summary>what this code does</summary>
+
+Sweeps the rectangular face upward by 2.0 along +Y, then caps the start and end to form a closed shell; because the face is planar and bounded, the result is a watertight solid cube.
+</details>
 
 <details>
 <summary>visual</summary>
@@ -149,30 +170,16 @@ Direction of final sweep: +Y
 
 </details>
 
-
-## Expose the cube module through lib.rs
-
-**src/lib.rs**
-
-```rust
-pub mod helpers;
-pub mod shapes;
-
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::cube;
-```
-
-**src/shapes/mod.rs**
+## Update `src/lib.rs` to expose `cube`
 
 ```rust
 pub mod cube;
 pub use cube::cube;
 ```
 
-
 ## Example entry point
 
-Use the shared export helpers from `src/helpers/mod.rs`, and the `cube` function we just created.
+Use the shared export helpers from `src/lib.rs`, and the `cube` function we just created.
 
 `examples/cube.rs` just calls the library functions:
 
@@ -193,14 +200,10 @@ This keeps the binary minimal and lets other sections reuse the same helpers.
 truck_brep/
 ├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs              # re-exports helpers + shapes
-│  ├─ helpers/
-│  │  └─ mod.rs           # save_obj, save_step_any
-│  ├─ shapes/
-│  │  ├─ mod.rs
-│  │  └─ cube.rs          # cube()
-│  └─ examples/
-│     └─ cube.rs          # calls into lib
+│  ├─ lib.rs              # save_obj, save_step_any, re-exports shapes
+│  └─ cube.rs             # cube()
+├─ examples/
+│  └─ cube.rs             # calls into lib
 └─ output/                # cube.obj, cube.step
 ```
 
@@ -209,9 +212,42 @@ truck_brep/
 </details>
 
 <details>
-<summary>Complete code (lib, shapes, example)</summary>
+<summary>Complete code (helpers in lib, cube module + example)</summary>
 
-**src/shapes/cube.rs**
+**src/lib.rs**
+
+```rust
+use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
+
+pub mod cube;
+pub use cube::cube;
+
+/// Export any B-rep (Solid or Shell) to STEP.
+pub fn save_step_any<T, P>(brep: &T, path: P) -> std::io::Result<()>
+where
+    T: Compress,
+    for<'a> StepModel<'a>: From<&'a T>,
+    P: AsRef<std::path::Path>,
+{
+    let compressed = brep.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(path, display.to_string())
+}
+
+/// Triangulate any B-rep (Solid or Shell) and write an OBJ mesh.
+pub fn save_obj(shape: &impl MeshedShape, path: &str) {
+    let mesh = shape.triangulation(0.01).to_polygon();
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+}
+```
+
+**src/cube.rs**
 
 ```rust
 use truck_modeling::prelude::*;
@@ -222,23 +258,6 @@ pub fn cube() -> Solid {
     let face: Face = builder::tsweep(&edge, 2.0 * Vector3::unit_x());
     builder::tsweep(&face, 2.0 * Vector3::unit_y())
 }
-```
-
-**src/shapes/mod.rs**
-
-```rust
-pub mod cube;
-pub use cube::cube;
-```
-
-**src/lib.rs**
-
-```rust
-pub mod helpers;
-pub mod shapes;
-
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::cube;
 ```
 
 **examples/cube.rs**
@@ -252,7 +271,3 @@ fn main() {
 ```
 
 </details>
-
-
-
-

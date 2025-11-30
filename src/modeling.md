@@ -71,32 +71,29 @@ your-workspace/
 
 ### Add a sibling crate dedicated to B-rep modeling
 
-- To keep analytic solids and exports separate, create a sibling crate named `truck_brep` in the parent directory that already contains `truck_meshes`:
+- Create a sibling crate named `truck_brep` in the parent directory that already contains `truck_meshes`:
 
 
 ```bash
 # run from the parent dir that already has truck_meshes/
 cargo new --lib truck_brep
-mkdir -p truck_brep/src/{helpers,shapes} truck_brep/examples truck_brep/output
+mkdir -p truck_brep/examples truck_brep/output
 ```
 
-- `src/helpers/` holds shared exports (OBJ/STEP).
-- `src/shapes/` holds B-rep shape modules (cube, torus, cylinder, bottle).
-- `examples/` holds runnable samples that call into `truck_brep::shapes::*`.
+- `src/lib.rs` holds the shared OBJ/STEP helpers and exports the per-shape modules.
+- Per-shape modules (`cube.rs`, `torus.rs`, `cylinder.rs`, `bottle.rs`) sit directly in `src/` next to `lib.rs`.
+- `examples/` holds runnable samples that call into `truck_brep::*`.
 - `output/` collects OBJ/STEP exports so they do not clutter source control.
 
 ```
 truck_brep/
-├─ Cargo.toml   # add truck-modeling, truck-meshalgo, truck-stepio deps
+├─ Cargo.toml      # add truck-modeling, truck-meshalgo, truck-stepio deps
 ├─ src/
-│  ├─ lib.rs       # re-exports helpers + shapes
-│  ├─ helpers/
-│  │  └─ mod.rs
-│  ├─ shapes/
-│  │  ├─ mod.rs
-│  │  └─ cube.rs   # add torus.rs, cylinder.rs, bottle.rs as you go
+│  ├─ lib.rs       # helpers + re-exports
+│  └─              # add torus.rs, cylinder.rs, bottle.rs as you go
+│ 
 ├─ examples/
-│  └─ cube.rs      # calls truck_brep::cube(), etc.
+│  └─              # calls truck_brep::cube(), etc.
 └─ output/         # generated OBJ/STEP files
 ```
 
@@ -111,23 +108,7 @@ truck-meshalgo = { version = "0.4.0" }
 truck-stepio = { version = "0.3.0" }
 ```
 
-### In `src/lib.rs` add `pub mod helpers; pub mod shapes;`
-
-```rust
-pub mod helpers;
-pub mod shapes;
-
-// Re-export shapes and helpers so examples can call them directly.
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::*;
-```
-
-### Create the helpers and shapes module files: 
-
-```sh
-touch truck_brep/src/helpers/mod.rs
-touch truck_brep/src/shapes/mod.rs
-```
+<br>
 
 <details>
   <summary><strong>Tessellate B-reps to Meshes</strong></summary>
@@ -174,28 +155,16 @@ Directory tree:
 
 ```
 truck_brep/
-├─ Cargo.toml
+├─ Cargo.toml      # add truck-modeling, truck-meshalgo, truck-stepio deps
 ├─ src/
-│  ├─ lib.rs
-│  ├─ helpers/
-│  │  └─ mod.rs
-│  └─ shapes/
-│     └─ mod.rs
+│  ├─ lib.rs       # helpers + re-exports
+│  └─              # add torus.rs, cylinder.rs, bottle.rs as you go
+│ 
 ├─ examples/
-│
-└─ output/
+│  └─              # calls truck_brep::cube(), etc.
+└─ output/         # generated OBJ/STEP files
 ```
 
-`src/lib.rs`:
-
-```rust
-pub mod helpers;
-pub mod shapes;
-
-// Re-export shapes or helpers so examples can `use truck_brep::cube;`
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::*;
-```
 
 `Cargo.toml` dependencies:
 
@@ -205,5 +174,3 @@ truck-modeling = { version = "0.6.0", features = ["serde"] }
 truck-meshalgo = { version = "0.4.0" }
 truck-stepio = { version = "0.3.0" }
 ```
-
-</details>

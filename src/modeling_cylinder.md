@@ -14,10 +14,12 @@ Keep the geometry and exports inside the library crate (mirroring the cube and t
   </ul>
 </details>
 
-## Create file `src/shapes/cylinder.rs`:
+### `src/cylinder.rs`:
 
 ```rust
 use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
 ```
 
 ```rust
@@ -29,7 +31,7 @@ pub fn cylinder() -> Solid {
 }
 ```
 
-### 1. Place a vertex on the base circle at `(0, 0, -1)`.
+#### 1. Place a vertex on the base circle at `(0, 0, -1)`.
 
 ```rust
   let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
@@ -51,7 +53,7 @@ pub fn cylinder() -> Solid {
 
 </details>
 
-### 2. Spin the vertex around +Z to form a circular wire.
+#### 2. Spin the vertex around +Z to form a circular wire.
 
 ```rust
   let circle: Wire = builder::rsweep(
@@ -77,7 +79,7 @@ Axis: +Z through (0, 1, -1)
 
 </details>
 
-### 3. Cap the wire into a planar disk.
+#### 3. Cap the wire into a planar disk.
 
 ```rust
   let disk: Face =
@@ -99,7 +101,7 @@ The circular wire is filled to a disk (face) if the wire is closed and planar.
 
 </details>
 
-### 4. Extrude the disk 2 units along +Z to make the solid.
+#### 4. Extrude the disk 2 units along +Z to make the solid.
 
 ```rust
   builder::tsweep(&disk, 2.0 * Vector3::unit_z())
@@ -122,29 +124,14 @@ Sweeping the disk upward (+Z) forms the cylinder volume:
 
 </details>
 
-## Expose the cylinder module through lib.rs
-
-**src/lib.rs**
+## Update `src/lib.rs` to expose `cylinder`
 
 ```rust
-pub mod helpers;
-pub mod shapes;
-
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::{cube, cylinder, torus};
-```
-
-**src/shapes/mod.rs**
-
-```rust
-pub mod cube;
-pub mod torus;
 pub mod cylinder;
-
-pub use cube::cube;
-pub use torus::torus;
 pub use cylinder::cylinder;
 ```
+
+Keep helpers in lib.rs and cylinder in `src/cylinder.rs`.
 
 ## Example entry point
 
@@ -171,49 +158,68 @@ fn main() {
 truck_brep/
 ├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs              # re-exports helpers + shapes
-│  ├─ helpers/
-│  │  └─ mod.rs           # shared OBJ/STEP helpers
-│  ├─ shapes/
-│  │  ├─ mod.rs           # exports cube, torus, cylinder, ...
-│  │  ├─ cube.rs          # from 3.1
-│  │  ├─ torus.rs         # from 3.2
-│  │  └─ cylinder.rs      # this section
-│  └─ examples/
-│     ├─ cube.rs
-│     ├─ torus.rs
-│     └─ cylinder.rs      # calls into lib
+│  ├─ lib.rs              # helpers + re-exports
+│  ├─ cube.rs
+│  ├─ torus.rs
+│  └─ cylinder.rs         # this section
+├─ examples/
+│  ├─ cube.rs
+│  ├─ torus.rs
+│  └─ cylinder.rs         # calls into lib
 └─ output/                # cylinder.obj, cylinder.step
 ```
 
 </details>
 
 <details>
-<summary>Complete code (lib + shapes + example)</summary>
+<summary>Complete code (helpers in lib, cylinder module + example)</summary>
 
 **src/lib.rs**
 
 ```rust
-pub mod helpers;
-pub mod shapes;
+use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
 
-pub use helpers::{save_obj, save_step_any};
-pub use shapes::{cube, cylinder, torus};
-```
-
-**src/shapes/mod.rs**
-
-```rust
-pub mod cube;
-pub mod torus;
 pub mod cylinder;
-
-pub use cube::cube;
-pub use torus::torus;
 pub use cylinder::cylinder;
+
+pub fn cylinder() -> Solid {
+    let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
+    let circle: Wire = builder::rsweep(
+        &vertex,
+        Point3::new(0.0, 1.0, -1.0),
+        Vector3::unit_z(),
+        Rad(7.0),
+    );
+    let disk: Face = builder::try_attach_plane(&vec![circle]).expect("cannot attach plane");
+    builder::tsweep(&disk, 2.0 * Vector3::unit_z())
+}
+
+/// Export any B-rep (Solid or Shell) to STEP.
+pub fn save_step_any<T, P>(brep: &T, path: P) -> std::io::Result<()>
+where
+    T: Compress,
+    for<'a> StepModel<'a>: From<&'a T>,
+    P: AsRef<std::path::Path>,
+{
+    let compressed = brep.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(path, display.to_string())
+}
+
+/// Triangulate any B-rep (Solid or Shell) and write an OBJ mesh.
+pub fn save_obj(shape: &impl MeshedShape, path: &str) {
+    let mesh = shape.triangulation(0.01).to_polygon();
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+}
 ```
 
-**src/shapes/cylinder.rs**
+**src/cylinder.rs**
 
 ```rust
 use truck_modeling::prelude::*;

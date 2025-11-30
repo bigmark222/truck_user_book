@@ -18,7 +18,7 @@
         - [Normals - Sphere](mesh_normals_sphere.md)
         - [Mesh Filters](mesh_filters.md)
 - [Chapter 3: Modeling](modeling.md)
-    - [B-rep Helper Module](modeling_helpers.md)
+    - [B-rep Helper Functions](modeling_helpers.md)
     - [Cube](modeling_cube.md)
     - [Torus](modeling_torus.md)
     - [Cylinder](modeling_cylinder.md)
@@ -28,7 +28,6 @@
     - [Render a Mesh](rendering_first_scene.md)
     - [Orbit + Hot Reload](rendering_update_scene.md)
     - [Reusable Viewer](rendering_simple_viewer.md)
-
 
 
 

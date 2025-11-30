@@ -2,17 +2,16 @@
 
 Model a bottle using Truck’s lower-level B-rep APIs (inspired by the classic OCCT bottle tutorial), keeping geometry and exports in the library just like the cube/torus/cylinder pages.
 
-## Components
+## Build a bottle with arcs, homotopy, sweeps, and glue ops
 
-- Neck (cylindrical shell)
-- Body bottom and walls (arc + homotopy + sweep)
-- Ceiling cutout (hole)
-- Gluing neck to body
-- Inner cavity (inverted inner shell)
+- Spin + cap: rotational sweep for neck circles, then cap with `try_attach_plane`
+- Side loft: arcs → `homotopy` → swept body shell
+- Glue: punch ceiling hole and stitch neck shell onto body
+- Hollowing: offset inner shell, invert faces, sew into outer body
 
-## Bottle in `src/shapes/bottle.rs`
+### `src/bottle.rs`
 
-Build everything inside the shapes module; binaries stay tiny and reusable.
+Keep helpers in `src/lib.rs`, and the bottle shape in its own file (sibling to lib.rs).
 
 ```rust
 use std::f64::consts::PI;
@@ -20,7 +19,7 @@ use truck_modeling::builder;
 use truck_modeling::prelude::*;
 ```
 
-### 1. Neck shell helper (`cylinder`)
+#### 1. Neck shell helper (`cylinder`)
 
 ```rust
 /// Shell for the neck or inner neck.
@@ -42,7 +41,7 @@ pub fn cylinder(bottom: f64, height: f64, radius: f64) -> Shell {
 
 </details>
 
-### 2. Body shell helper (`body_shell`)
+#### 2. Body shell helper (`body_shell`)
 
 ```rust
 /// Outer/inner body shell built from arcs, homotopy, and sweep.
@@ -69,7 +68,7 @@ pub fn body_shell(bottom: f64, height: f64, width: f64, thickness: f64) -> Shell
 
 </details>
 
-### 3. Glue neck onto body (`glue_body_neck`)
+#### 3. Glue neck onto body (`glue_body_neck`)
 
 ```rust
 /// Punch a hole in the ceiling and glue neck faces on top.
@@ -92,7 +91,7 @@ pub fn glue_body_neck(body: &mut Shell, neck: Shell) {
 
 </details>
 
-### 4. Assemble the full bottle (`bottle`)
+#### 4. Assemble the full bottle (`bottle`)
 
 ```rust
 /// Hollow bottle with inner cavity and neck.
@@ -141,30 +140,8 @@ pub fn bottle(height: f64, width: f64, thickness: f64) -> Solid {
 
 ## Expose the bottle module through lib.rs
 
-**src/lib.rs**
-
-```rust
-pub mod shapes;
-pub use shapes::{
-    bottle, cube, cylinder, torus,
-};
-pub mod helpers;
-pub use helpers::{save_obj, save_step_any};
-```
-
-**src/shapes/mod.rs**
-
-```rust
-pub mod cube;
-pub mod torus;
-pub mod cylinder;
-pub mod bottle;
-
-pub use cube::cube;
-pub use torus::torus;
-pub use cylinder::cylinder;
-pub use bottle::bottle;
-```
+Helpers live in `src/lib.rs`; shapes live in sibling files under `src/` and are re-exported through `lib.rs`.
+Helpers live in `src/lib.rs`; shapes live in `src/` (bottle.rs, torus.rs, etc.) and are re-exported through `lib.rs`.
 
 ## Example entry point
 
@@ -185,54 +162,67 @@ fn main() {
 truck_brep/
 ├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs              # re-exports helpers + shapes
-│  ├─ helpers/
-│  │  └─ mod.rs           # shared OBJ/STEP helpers
-│  ├─ shapes/
-│  │  ├─ mod.rs           # exports cube, torus, cylinder, bottle, ...
-│  │  ├─ cube.rs
-│  │  ├─ torus.rs
-│  │  ├─ cylinder.rs
-│  │  └─ bottle.rs        # this section
-│  └─ examples/
-│     ├─ cube.rs
-│     ├─ torus.rs
-│     ├─ cylinder.rs
-│     └─ bottle.rs        # calls into lib
+│  ├─ lib.rs              # helpers + re-exports
+│  ├─ cube.rs
+│  ├─ torus.rs
+│  ├─ cylinder.rs
+│  └─ bottle.rs           # this section
+├─ examples/
+│  ├─ cube.rs
+│  ├─ torus.rs
+│  ├─ cylinder.rs
+│  └─ bottle.rs
 └─ output/                # cube.obj, torus.obj, cylinder.obj, bottle.obj, etc.
-```
+ ```
 
 </details>
 
+## Update `src/lib.rs` to expose `bottle`
+
+```rust
+pub mod bottle;
+pub use bottle::bottle;
+```
+
+Keep helpers in lib.rs and bottle in `src/bottle.rs`.
+
 <details>
-<summary>Complete code (lib + shapes + example)</summary>
+<summary>Complete code (helpers in lib, bottle module + example)</summary>
 
 **src/lib.rs**
 
 ```rust
-pub mod shapes;
-pub use shapes::{
-    bottle, cube, cylinder, torus,
-};
-pub mod helpers;
-pub use helpers::{save_obj, save_step_any};
-```
+use truck_modeling::prelude::*;
+use truck_meshalgo::prelude::*;
+use truck_stepio::{CompleteStepDisplay, StepModel};
 
-**src/shapes/mod.rs**
-
-```rust
-pub mod cube;
-pub mod torus;
-pub mod cylinder;
 pub mod bottle;
-
-pub use cube::cube;
-pub use torus::torus;
-pub use cylinder::cylinder;
 pub use bottle::bottle;
+
+/// Export any B-rep (Solid or Shell) to STEP.
+pub fn save_step_any<T, P>(brep: &T, path: P) -> std::io::Result<()>
+where
+    T: Compress,
+    for<'a> StepModel<'a>: From<&'a T>,
+    P: AsRef<std::path::Path>,
+{
+    let compressed = brep.compress();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    std::fs::write(path, display.to_string())
+}
+
+/// Triangulate any B-rep (Solid or Shell) and write an OBJ mesh.
+pub fn save_obj(shape: &impl MeshedShape, path: &str) {
+    let mesh = shape.triangulation(0.01).to_polygon();
+    let mut obj = std::fs::File::create(path).unwrap();
+    obj::write(&mesh, &mut obj).unwrap();
+}
 ```
 
-**src/shapes/bottle.rs**
+**src/bottle.rs**
 
 ```rust
 use std::f64::consts::PI;
@@ -260,6 +250,7 @@ pub fn body_shell(bottom: f64, height: f64, width: f64, thickness: f64) -> Shell
     solid.into_boundaries().pop().unwrap()
 }
 
+/// Punch a hole in the ceiling and glue neck faces on top.
 pub fn glue_body_neck(body: &mut Shell, neck: Shell) {
     let body_ceiling = body.last_mut().unwrap();
     let wire = neck[0].boundaries()[0].clone();
@@ -269,6 +260,7 @@ pub fn glue_body_neck(body: &mut Shell, neck: Shell) {
     body.extend(neck.into_iter().skip(1));
 }
 
+/// Hollow bottle with inner cavity and neck.
 pub fn bottle(height: f64, width: f64, thickness: f64) -> Solid {
     let mut body = body_shell(-height / 2.0, height, width, thickness);
     let neck = cylinder(height / 2.0, height / 10.0, thickness / 4.0);
