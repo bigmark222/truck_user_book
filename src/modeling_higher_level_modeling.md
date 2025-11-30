@@ -16,7 +16,7 @@ Keep helpers in `src/lib.rs`, and the bottle shape in its own file (sibling to l
 ```rust
 use std::f64::consts::PI;
 use truck_modeling::builder;
-use truck_modeling::prelude::*;
+use truck_modeling::*;
 ```
 
 #### 1. Neck shell helper (`cylinder`)
@@ -152,8 +152,8 @@ pub use bottle::bottle;
 ```rust
 fn main() {
     let bottle = truck_brep::bottle(2.0, 1.0, 0.6);
-    truck_brep::save_obj(&bottle, "output/bottle.obj");
-    truck_brep::save_step_any(&bottle, "output/bottle.step");
+    truck_brep::save_obj(&bottle, "output/bottle.obj").unwrap();
+    truck_brep::save_step(&bottle, "output/bottle.step").unwrap();
 }
 ```
 
@@ -164,74 +164,31 @@ fn main() {
 
 ```
 truck_brep/
-├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs              # helpers + re-exports
+│  ├─ lib.rs      # helpers + re-exports
 │  ├─ cube.rs
 │  ├─ torus.rs
 │  ├─ cylinder.rs
-│  └─ bottle.rs           # this section
+│  └─ bottle.rs   # this section
 ├─ examples/
 │  ├─ cube.rs
 │  ├─ torus.rs
 │  ├─ cylinder.rs
 │  └─ bottle.rs
-└─ output/                # cube.obj, torus.obj, cylinder.obj, bottle.obj, etc.
+└─ output/        # created at runtime
  ```
 
 </details>
 
 <details>
-<summary>Complete code (helpers in lib, bottle module + example)</summary>
-
-**src/lib.rs**
-
-```rust
-use truck_modeling::prelude::*;
-use truck_meshalgo::prelude::*;
-use truck_stepio::{CompleteStepDisplay, StepModel};
-
-pub mod cube;
-pub use cube::cube;
-
-pub mod torus;
-pub use torus::torus;
-
-pub mod cylinder;
-pub use cylinder::cylinder;
-
-pub mod bottle;
-pub use bottle::bottle;
-
-/// Export any B-rep (Solid or Shell) to STEP.
-pub fn save_step_any<T, P>(brep: &T, path: P) -> std::io::Result<()>
-where
-    T: Compress,
-    for<'a> StepModel<'a>: From<&'a T>,
-    P: AsRef<std::path::Path>,
-{
-    let compressed = brep.compress();
-    let display = CompleteStepDisplay::new(
-        StepModel::from(&compressed),
-        Default::default(),
-    );
-    std::fs::write(path, display.to_string())
-}
-
-/// Triangulate any B-rep (Solid or Shell) and write an OBJ mesh.
-pub fn save_obj(shape: &impl MeshedShape, path: &str) {
-    let mesh = shape.triangulation(0.01).to_polygon();
-    let mut obj = std::fs::File::create(path).unwrap();
-    obj::write(&mesh, &mut obj).unwrap();
-}
-```
+<summary>Complete code</summary>
 
 **src/bottle.rs**
 
 ```rust
 use std::f64::consts::PI;
 use truck_modeling::builder;
-use truck_modeling::prelude::*;
+use truck_modeling::*;
 
 pub fn cylinder(bottom: f64, height: f64, radius: f64) -> Shell {
     let vertex = builder::vertex(Point3::new(0.0, bottom, radius));
@@ -300,8 +257,8 @@ pub fn bottle(height: f64, width: f64, thickness: f64) -> Solid {
 ```rust
 fn main() {
     let bottle = truck_brep::bottle(2.0, 1.0, 0.6);
-    truck_brep::save_obj(&bottle, "output/bottle.obj");
-    truck_brep::save_step_any(&bottle, "output/bottle.step");
+    truck_brep::save_obj(&bottle, "output/bottle.obj").unwrap();
+    truck_brep::save_step(&bottle, "output/bottle.step").unwrap();
 }
 ```
 

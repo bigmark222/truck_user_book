@@ -3,16 +3,19 @@
 Model a precise B-rep cube in Truck
 
 <details>
-  <summary><strong>B-rep building blocks</strong></summary>
+  <summary><strong>B-rep Building Blocks</strong></summary>
+
   <ul>
-    <li><b>Vertex:</b> point</li>
-    <li><b>Edge:</b> curve between two vertices</li>
-    <li><b>Wire:</b> sequence of edges forming a loop</li>
-    <li><b>Face:</b> bounded by a closed wire</li>
-    <li><b>Shell:</b> group of faces</li>
-    <li><b>Solid:</b> closed shell forming a volume</li>
+    <li><b>Vertex</b> → a point in 3D space.</li>
+    <li><b>Edge</b> → a curve connecting two vertices (line, arc, spline, etc.).</li>
+    <li><b>Wire</b> → an ordered loop of edges; closed wires bound faces.</li>
+    <li><b>Face</b> → a surface patch bounded by one outer wire (plus optional inner wires for holes).</li>
+    <li><b>Shell</b> → a connected set of stitched faces.</li>
+    <li><b>Solid</b> → a closed, watertight shell enclosing a volume.</li>
   </ul>
+
 </details>
+
 
 ## Build a cube with `tsweep`
 
@@ -33,20 +36,16 @@ Model a precise B-rep cube in Truck
 ### `src/cube.rs`
 
 ```rust
-use truck_modeling::prelude::*;
-use truck_meshalgo::prelude::*;
-use truck_stepio::{CompleteStepDisplay, StepModel};
+use truck_modeling::*;
 ```
 
 ```rust
-
-/// Build a solid cube by chaining translational sweeps.
 pub fn cube() -> Solid {
-
-  // STEPS 1-4 HERE
+  // STEPS 1-4 GO HERE
 
 }
 ```
+
 
 #### 1. Place the first vertex at `(-1, 0, -1)`.
 
@@ -179,15 +178,13 @@ pub use cube::cube;
 
 ## Example entry point
 
-Use the shared export helpers from `src/lib.rs`, and the `cube` function we just created.
-
-`examples/cube.rs` just calls the library functions:
+`examples/cube.rs` calls into the library and uses the helper wrappers that create output folders automatically:
 
 ```rust
 fn main() {
     let cube = truck_brep::cube();
-    truck_brep::save_obj(&cube, "output/cube.obj");
-    truck_brep::save_step_any(&cube, "output/cube.step");
+    truck_brep::save_obj(&cube, "output/cube.obj").unwrap();
+    truck_brep::save_step(&cube, "output/cube.step").unwrap();
 }
 ```
 
@@ -200,13 +197,12 @@ This keeps the binary minimal and lets other sections reuse the same helpers.
 
 ```
 truck_brep/
-├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs              # save_obj, save_step_any, re-exports shapes
-│  └─ cube.rs             # cube()
+│  ├─ lib.rs      # helpers + re-exports
+│  └─ cube.rs     # cube()
 ├─ examples/
-│  └─ cube.rs             # calls into lib
-└─ output/                # cube.obj, cube.step
+│  └─ cube.rs     # calls into lib
+└─ output/        # generated OBJ/STEP (created at runtime)
 ```
 
 </details>
@@ -214,45 +210,58 @@ truck_brep/
 </details>
 
 <details>
-<summary>Complete code (helpers in lib, cube module + example)</summary>
+<summary>Complete code</summary>
 
-**src/lib.rs**
+**src/lib.rs** (imports/re-exports abbreviated)
 
 ```rust
-use truck_modeling::prelude::*;
+use std::{fs, io, path::Path};
+
 use truck_meshalgo::prelude::*;
-use truck_stepio::{CompleteStepDisplay, StepModel};
+use truck_modeling::*;
+use truck_stepio::out::{CompleteStepDisplay, StepModel};
+use truck_topology::compress::{CompressedShell, CompressedSolid};
 
 pub mod cube;
 pub use cube::cube;
+// torus, cylinder, bottle modules are exported similarly
 
-/// Export any B-rep (Solid or Shell) to STEP.
-pub fn save_step_any<T, P>(brep: &T, path: P) -> std::io::Result<()>
-where
-    T: Compress,
-    for<'a> StepModel<'a>: From<&'a T>,
-    P: AsRef<std::path::Path>,
-{
-    let compressed = brep.compress();
-    let display = CompleteStepDisplay::new(
-        StepModel::from(&compressed),
-        Default::default(),
-    );
-    std::fs::write(path, display.to_string())
+/// Helper to compress modeling shapes into STEP-compatible data.
+pub trait StepCompress {
+    type Compressed;
+    fn compress_for_step(&self) -> Self::Compressed;
 }
 
-/// Triangulate any B-rep (Solid or Shell) and write an OBJ mesh.
-pub fn save_obj(shape: &impl MeshedShape, path: &str) {
-    let mesh = shape.triangulation(0.01).to_polygon();
-    let mut obj = std::fs::File::create(path).unwrap();
-    obj::write(&mesh, &mut obj).unwrap();
+impl StepCompress for Shell {
+    type Compressed = CompressedShell<Point3, Curve, Surface>;
+    fn compress_for_step(&self) -> Self::Compressed { self.compress() }
+}
+
+impl StepCompress for Solid {
+    type Compressed = CompressedSolid<Point3, Curve, Surface>;
+    fn compress_for_step(&self) -> Self::Compressed { self.compress() }
+}
+
+pub fn save_step_any<T, P>(brep: &T, path: P) -> io::Result<()>
+where
+    T: StepCompress,
+    for<'a> StepModel<'a, Point3, Curve, Surface>: From<&'a T::Compressed>,
+    P: AsRef<Path>,
+{
+    // ...
+}
+
+pub fn save_step<T, P>(brep: &T, path: P) -> io::Result<()> { save_step_any(brep, path) }
+
+pub fn save_obj(shape: &impl MeshableShape, path: impl AsRef<Path>) -> io::Result<()> {
+    // ...
 }
 ```
 
 **src/cube.rs**
 
 ```rust
-use truck_modeling::prelude::*;
+use truck_modeling::*;
 
 pub fn cube() -> Solid {
     let vertex: Vertex = builder::vertex(Point3::new(-1.0, 0.0, -1.0));
@@ -267,8 +276,8 @@ pub fn cube() -> Solid {
 ```rust
 fn main() {
     let cube = truck_brep::cube();
-    truck_brep::save_obj(&cube, "output/cube.obj");
-    truck_brep::save_step_any(&cube, "output/cube.step");
+    truck_brep::save_obj(&cube, "output/cube.obj").unwrap();
+    truck_brep::save_step(&cube, "output/cube.step").unwrap();
 }
 ```
 

@@ -1,6 +1,4 @@
-# Cylinder (rotational + planar + translational sweep)
-
-Keep the geometry and exports inside the library crate (mirroring the cube and torus pages) so binaries stay tiny.
+# Cylinder
 
 ## Build a cylinder with `rsweep`, `try_attach_plane`, and `tsweep`
 
@@ -14,19 +12,15 @@ Keep the geometry and exports inside the library crate (mirroring the cube and t
   </ul>
 </details>
 
-### `src/cylinder.rs`:
+### `src/cylinder.rs`
 
 ```rust
-use truck_modeling::prelude::*;
-use truck_meshalgo::prelude::*;
-use truck_stepio::{CompleteStepDisplay, StepModel};
+use truck_modeling::*;
 ```
 
 ```rust
-/// Build a solid cylinder: rotational sweep → planar face → translational sweep.
-pub fn cylinder() -> Solid {
-
-  // STEPS 1-4 HERE
+pub fn torus() -> Solid {
+  // STEPS 1-3 GO HERE
 
 }
 ```
@@ -140,8 +134,8 @@ Keep helpers in lib.rs and cylinder in `src/cylinder.rs`.
 ```rust
 fn main() {
     let cylinder = truck_brep::cylinder();
-    truck_brep::save_obj(&cylinder, "output/cylinder.obj");
-    truck_brep::save_step_any(&cylinder, "output/cylinder.step");
+    truck_brep::save_obj(&cylinder, "output/cylinder.obj").unwrap();
+    truck_brep::save_step(&cylinder, "output/cylinder.step").unwrap();
 }
 ```
 
@@ -152,79 +146,27 @@ fn main() {
 
 ```
 truck_brep/
-├─ Cargo.toml
 ├─ src/
-│  ├─ lib.rs              # helpers + re-exports
+│  ├─ lib.rs      # helpers + re-exports
 │  ├─ cube.rs
 │  ├─ torus.rs
-│  └─ cylinder.rs         # this section
+│  └─ cylinder.rs # this section
 ├─ examples/
 │  ├─ cube.rs
 │  ├─ torus.rs
-│  └─ cylinder.rs         # calls into lib
-└─ output/                # cylinder.obj, cylinder.step
+│  └─ cylinder.rs
+└─ output/        # created at runtime
 ```
 
 </details>
 
 <details>
-<summary>Complete code (helpers in lib, cylinder module + example)</summary>
-
-**src/lib.rs**
-
-```rust
-use truck_modeling::prelude::*;
-use truck_meshalgo::prelude::*;
-use truck_stepio::{CompleteStepDisplay, StepModel};
-
-pub mod cube;
-pub use cube::cube;
-
-pub mod torus;
-pub use torus::torus;
-
-pub mod cylinder;
-pub use cylinder::cylinder;
-
-pub fn cylinder() -> Solid {
-    let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
-    let circle: Wire = builder::rsweep(
-        &vertex,
-        Point3::new(0.0, 1.0, -1.0),
-        Vector3::unit_z(),
-        Rad(7.0),
-    );
-    let disk: Face = builder::try_attach_plane(&vec![circle]).expect("cannot attach plane");
-    builder::tsweep(&disk, 2.0 * Vector3::unit_z())
-}
-
-/// Export any B-rep (Solid or Shell) to STEP.
-pub fn save_step_any<T, P>(brep: &T, path: P) -> std::io::Result<()>
-where
-    T: Compress,
-    for<'a> StepModel<'a>: From<&'a T>,
-    P: AsRef<std::path::Path>,
-{
-    let compressed = brep.compress();
-    let display = CompleteStepDisplay::new(
-        StepModel::from(&compressed),
-        Default::default(),
-    );
-    std::fs::write(path, display.to_string())
-}
-
-/// Triangulate any B-rep (Solid or Shell) and write an OBJ mesh.
-pub fn save_obj(shape: &impl MeshedShape, path: &str) {
-    let mesh = shape.triangulation(0.01).to_polygon();
-    let mut obj = std::fs::File::create(path).unwrap();
-    obj::write(&mesh, &mut obj).unwrap();
-}
-```
+<summary>Complete code</summary>
 
 **src/cylinder.rs**
 
 ```rust
-use truck_modeling::prelude::*;
+use truck_modeling::*;
 
 pub fn cylinder() -> Solid {
     let vertex: Vertex = builder::vertex(Point3::new(0.0, 0.0, -1.0));
@@ -244,8 +186,8 @@ pub fn cylinder() -> Solid {
 ```rust
 fn main() {
     let cylinder = truck_brep::cylinder();
-    truck_brep::save_obj(&cylinder, "output/cylinder.obj");
-    truck_brep::save_step_any(&cylinder, "output/cylinder.step");
+    truck_brep::save_obj(&cylinder, "output/cylinder.obj").unwrap();
+    truck_brep::save_step(&cylinder, "output/cylinder.step").unwrap();
 }
 ```
 

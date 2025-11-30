@@ -30,7 +30,6 @@ This is the representation used by major CAD kernels:
 <br>
 <br>
 
-
 <details>
   <summary><strong>Why use B-reps?</strong></summary>
 
@@ -103,9 +102,15 @@ Add the Truck crates (match the versions you used in `truck_meshes` so everythin
 
 ```toml
 [dependencies]
-truck-modeling = { version = "0.6.0", features = ["serde"] }
-truck-meshalgo = { version = "0.4.0" }
-truck-stepio = { version = "0.3.0" }
+# modeling API
+truck-modeling = "0.6.0"
+# meshing modeled shape
+truck-meshalgo = "0.4.0"
+# output STEP
+truck-stepio = "0.3.0"
+# topology helpers (compression)
+truck-topology = "0.6.0"
+
 ```
 
 <br>
@@ -170,7 +175,13 @@ truck_brep/
 
 ```toml
 [dependencies]
-truck-modeling = { version = "0.6.0", features = ["serde"] }
-truck-meshalgo = { version = "0.4.0" }
-truck-stepio = { version = "0.3.0" }
+# modeling API
+truck-modeling = "0.6.0"
+# meshing modeled shape
+truck-meshalgo = "0.4.0"
+# output STEP
+truck-stepio = "0.3.0"
+# topology helpers (compression)
+truck-topology = "0.6.0"
+
 ```
