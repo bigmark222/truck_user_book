@@ -77,9 +77,10 @@ your-workspace/
 ```bash
 # run from the parent dir that already has truck_meshes/
 cargo new --lib truck_brep
-mkdir -p truck_brep/src/shapes truck_brep/examples truck_brep/output
+mkdir -p truck_brep/src/{helpers,shapes} truck_brep/examples truck_brep/output
 ```
 
+- `src/helpers/` holds shared exports (OBJ/STEP).
 - `src/shapes/` holds B-rep shape modules (cube, torus, cylinder, bottle).
 - `examples/` holds runnable samples that call into `truck_brep::shapes::*`.
 - `output/` collects OBJ/STEP exports so they do not clutter source control.
@@ -88,7 +89,9 @@ mkdir -p truck_brep/src/shapes truck_brep/examples truck_brep/output
 truck_brep/
 ├─ Cargo.toml   # add truck-modeling, truck-meshalgo, truck-stepio deps
 ├─ src/
-│  ├─ lib.rs       # re-exports shapes
+│  ├─ lib.rs       # re-exports helpers + shapes
+│  ├─ helpers/
+│  │  └─ mod.rs
 │  ├─ shapes/
 │  │  ├─ mod.rs
 │  │  └─ cube.rs   # add torus.rs, cylinder.rs, bottle.rs as you go
@@ -108,20 +111,21 @@ truck-meshalgo = { version = "0.4.0" }
 truck-stepio = { version = "0.3.0" }
 ```
 
-### In `src/lib.rs` add `pub mod shapes;`
-
-- This allows you to re-export any helpers you want at the crate root.
+### In `src/lib.rs` add `pub mod helpers; pub mod shapes;`
 
 ```rust
+pub mod helpers;
 pub mod shapes;
 
-// Re-export shapes or helpers so examples can `use truck_brep::cube;`
+// Re-export shapes and helpers so examples can call them directly.
+pub use helpers::{save_obj, save_step_any};
 pub use shapes::*;
 ```
 
-### Create the shapes module file: 
+### Create the helpers and shapes module files: 
 
 ```sh
+touch truck_brep/src/helpers/mod.rs
 touch truck_brep/src/shapes/mod.rs
 ```
 
@@ -173,19 +177,23 @@ truck_brep/
 ├─ Cargo.toml
 ├─ src/
 │  ├─ lib.rs
+│  ├─ helpers/
+│  │  └─ mod.rs
 │  └─ shapes/
 │     └─ mod.rs
 ├─ examples/
-│  └─ cube.rs
+│
 └─ output/
 ```
 
 `src/lib.rs`:
 
 ```rust
+pub mod helpers;
 pub mod shapes;
 
 // Re-export shapes or helpers so examples can `use truck_brep::cube;`
+pub use helpers::{save_obj, save_step_any};
 pub use shapes::*;
 ```
 
