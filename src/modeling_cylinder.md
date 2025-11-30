@@ -181,6 +181,12 @@ use truck_modeling::prelude::*;
 use truck_meshalgo::prelude::*;
 use truck_stepio::{CompleteStepDisplay, StepModel};
 
+pub mod cube;
+pub use cube::cube;
+
+pub mod torus;
+pub use torus::torus;
+
 pub mod cylinder;
 pub use cylinder::cylinder;
 

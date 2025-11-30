@@ -138,10 +138,12 @@ pub fn bottle(height: f64, width: f64, thickness: f64) -> Solid {
 
 </details>
 
-## Expose the bottle module through lib.rs
+## Update `src/lib.rs` to expose `bottle`
 
-Helpers live in `src/lib.rs`; shapes live in sibling files under `src/` and are re-exported through `lib.rs`.
-Helpers live in `src/lib.rs`; shapes live in `src/` (bottle.rs, torus.rs, etc.) and are re-exported through `lib.rs`.
+```rust
+pub mod bottle;
+pub use bottle::bottle;
+```
 
 ## Example entry point
 
@@ -177,13 +179,6 @@ truck_brep/
 
 </details>
 
-## Update `src/lib.rs` to expose `bottle`
-
-```rust
-pub mod bottle;
-pub use bottle::bottle;
-```
-
 Keep helpers in lib.rs and bottle in `src/bottle.rs`.
 
 <details>
@@ -195,6 +190,15 @@ Keep helpers in lib.rs and bottle in `src/bottle.rs`.
 use truck_modeling::prelude::*;
 use truck_meshalgo::prelude::*;
 use truck_stepio::{CompleteStepDisplay, StepModel};
+
+pub mod cube;
+pub use cube::cube;
+
+pub mod torus;
+pub use torus::torus;
+
+pub mod cylinder;
+pub use cylinder::cylinder;
 
 pub mod bottle;
 pub use bottle::bottle;
