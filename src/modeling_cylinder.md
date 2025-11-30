@@ -19,8 +19,8 @@ use truck_modeling::*;
 ```
 
 ```rust
-pub fn torus() -> Solid {
-  // STEPS 1-3 GO HERE
+pub fn cylinder() -> Solid {
+  // STEPS 1-4 GO HERE
 
 }
 ```
