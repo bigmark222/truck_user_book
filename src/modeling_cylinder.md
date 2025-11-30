@@ -145,11 +145,7 @@ fn main() {
 }
 ```
 
-## Concepts recap
-
-- `rsweep`: rotational sweep to build circular edges
-- `try_attach_plane`: turn a closed planar wire into a face
-- `tsweep`: translational sweep to create solids from faces
+<br>
 
 <details>
 <summary>Directory tree (for this section)</summary>

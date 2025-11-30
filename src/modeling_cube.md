@@ -193,6 +193,8 @@ fn main() {
 
 This keeps the binary minimal and lets other sections reuse the same helpers.
 
+<br>
+
 <details>
 <summary>Directory tree</summary>
 

@@ -157,6 +157,8 @@ fn main() {
 }
 ```
 
+<br>
+
 <details>
 <summary>Directory tree (for this section)</summary>
 
@@ -178,8 +180,6 @@ truck_brep/
  ```
 
 </details>
-
-Keep helpers in lib.rs and bottle in `src/bottle.rs`.
 
 <details>
 <summary>Complete code (helpers in lib, bottle module + example)</summary>
