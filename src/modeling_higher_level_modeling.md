@@ -2,7 +2,7 @@
 
 Model a bottle using Truck’s lower-level B-rep APIs (inspired by the classic OCCT bottle tutorial), keeping geometry and exports in the library just like the cube/torus/cylinder pages.
 
-## Build a bottle with arcs, homotopy, sweeps, and glue ops
+## Build a bottle with arcs, `homotopy`, sweeps, and glue ops
 
 - Spin + cap: rotational sweep for neck circles, then cap with `try_attach_plane`
 - Side loft: arcs → `homotopy` → swept body shell
