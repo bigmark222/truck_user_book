@@ -212,7 +212,7 @@ truck_brep/
 <details>
 <summary>Complete code</summary>
 
-**src/lib.rs** (imports/re-exports abbreviated)
+**src/lib.rs**
 
 ```rust
 use std::{fs, io, path::Path};

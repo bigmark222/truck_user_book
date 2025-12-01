@@ -158,6 +158,55 @@ truck_brep/
 <details>
 <summary>Complete code</summary>
 
+**src/lib.rs**
+
+```rust
+use std::{fs, io, path::Path};
+
+use truck_meshalgo::prelude::*;
+use truck_modeling::*;
+use truck_stepio::out::{CompleteStepDisplay, StepModel};
+use truck_topology::compress::{CompressedShell, CompressedSolid};
+
+pub mod cube;
+pub use cube::cube;
+
+pub mod torus;
+pub use torus::torus;
+// cylinder, bottle modules are exported similarly
+
+/// Helper to compress modeling shapes into STEP-compatible data.
+pub trait StepCompress {
+    type Compressed;
+    fn compress_for_step(&self) -> Self::Compressed;
+}
+
+impl StepCompress for Shell {
+    type Compressed = CompressedShell<Point3, Curve, Surface>;
+    fn compress_for_step(&self) -> Self::Compressed { self.compress() }
+}
+
+impl StepCompress for Solid {
+    type Compressed = CompressedSolid<Point3, Curve, Surface>;
+    fn compress_for_step(&self) -> Self::Compressed { self.compress() }
+}
+
+pub fn save_step_any<T, P>(brep: &T, path: P) -> io::Result<()>
+where
+    T: StepCompress,
+    for<'a> StepModel<'a, Point3, Curve, Surface>: From<&'a T::Compressed>,
+    P: AsRef<Path>,
+{
+    // ...
+}
+
+pub fn save_step<T, P>(brep: &T, path: P) -> io::Result<()> { save_step_any(brep, path) }
+
+pub fn save_obj(shape: &impl MeshableShape, path: impl AsRef<Path>) -> io::Result<()> {
+    // ...
+}
+```
+
 **src/torus.rs**
 
 ```rust
