@@ -198,19 +198,34 @@ impl StepCompress for Solid {
     fn compress_for_step(&self) -> Self::Compressed { self.compress() }
 }
 
-pub fn save_step_any<T, P>(brep: &T, path: P) -> io::Result<()>
+/// Export any B-rep (Solid or Shell) to STEP.
+pub fn save_step<T, P>(brep: &T, path: P) -> io::Result<()>
 where
     T: StepCompress,
     for<'a> StepModel<'a, Point3, Curve, Surface>: From<&'a T::Compressed>,
     P: AsRef<Path>,
 {
-    // ...
+    let path = path.as_ref();
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    let compressed = brep.compress_for_step();
+    let display = CompleteStepDisplay::new(
+        StepModel::from(&compressed),
+        Default::default(),
+    );
+    fs::write(path, display.to_string())
 }
 
-pub fn save_step<T, P>(brep: &T, path: P) -> io::Result<()> { save_step_any(brep, path) }
-
+/// Triangulate any B-rep (Solid or Shell) and write an OBJ mesh.
 pub fn save_obj(shape: &impl MeshableShape, path: impl AsRef<Path>) -> io::Result<()> {
-    // ...
+    let mesh = shape.triangulation(0.01).to_polygon();
+    let path = path.as_ref();
+    if let Some(parent) = path.parent() {
+        fs::create_dir_all(parent)?;
+    }
+    let mut obj = fs::File::create(path)?;
+    obj::write(&mesh, &mut obj).map_err(|err| io::Error::new(io::ErrorKind::Other, err))
 }
 ```
 
