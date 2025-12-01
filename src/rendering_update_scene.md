@@ -4,7 +4,7 @@ Add basic orbit controls and make the viewer reload whenever the OBJ file change
 
 ## Accept a mesh path
 
-Update `main` to read a file path (defaulting to `assets/output/mesh.obj`):
+Let the binary remain tiny and read a file path (defaulting to `assets/output/mesh.obj`) before calling into the library:
 
 ```rust
 let mesh_path = std::env::args()
@@ -12,36 +12,47 @@ let mesh_path = std::env::args()
     .unwrap_or_else(|| "output/mesh.obj".into());
 ```
 
-Store it in a resource so startup systems can load it.
+Store it in a resource so startup systems can load it. Paths are relative to your `assets/` directory (so `output/mesh.obj` means `assets/output/mesh.obj` on disk).
 
 ## Orbit + zoom
 
-A simple orbit controller using Bevy input events:
+A simple orbit controller using Bevy input events. Keep it in `truck_viewer/src/lib.rs` (or split into `app.rs` and re-export from `lib.rs`), and have `src/main.rs` just pass the mesh path to a helper like `run_with_mesh`.
 
 ```rust
 use bevy::prelude::*;
 use bevy::input::mouse::{MouseMotion, MouseWheel};
 
 #[derive(Resource)]
-struct OrbitCamera {
+pub struct OrbitCamera {
     yaw: f32,
     pitch: f32,
     radius: f32,
     target: Vec3,
 }
 
-fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .insert_resource(OrbitCamera {
-            yaw: 0.0,
-            pitch: 0.3,
-            radius: 6.0,
-            target: Vec3::ZERO,
-        })
-        .add_systems(Startup, setup_camera)
-        .add_systems(Update, orbit_camera)
-        .run();
+pub fn build_app(mesh_path: String) -> App {
+    let mut app = App::new();
+    app.add_plugins(DefaultPlugins.set(WindowPlugin {
+        primary_window: Some(Window {
+            title: "Truck mesh with Bevy".into(),
+            ..Default::default()
+        }),
+        ..Default::default()
+    }))
+    .insert_resource(mesh_path)
+    .insert_resource(OrbitCamera {
+        yaw: 0.0,
+        pitch: 0.3,
+        radius: 6.0,
+        target: Vec3::ZERO,
+    })
+    .add_systems(Startup, setup_camera)
+    .add_systems(Update, orbit_camera);
+    app
+}
+
+pub fn run_with_mesh(mesh_path: impl Into<String>) {
+    build_app(mesh_path.into()).run();
 }
 
 fn setup_camera(mut commands: Commands) {
@@ -89,6 +100,18 @@ fn orbit_camera(
 }
 ```
 
+`truck_viewer/src/main.rs` can stay minimal:
+
+```rust
+fn main() {
+    let mesh_path = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| "output/mesh.obj".into());
+
+    truck_viewer::run_with_mesh(mesh_path);
+}
+```
+
 ## Auto-reload with `cargo watch`
 
 Install once:
@@ -100,7 +123,7 @@ cargo install cargo-watch
 Run the viewer and rerun on file changes (so your mesh reloads cleanly):
 
 ```bash
-cargo watch -w assets/output/mesh.obj -x 'run -- assets/output/mesh.obj'
+cargo watch -w assets/output/mesh.obj -x 'run -- output/mesh.obj'
 ```
 
 If you keep Bevy’s `file_watcher` feature enabled, asset edits in `assets/` will hot-reload without restarting; the `cargo watch` loop is still handy for rebuilding code changes alongside mesh updates.

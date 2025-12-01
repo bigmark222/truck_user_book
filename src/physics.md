@@ -1,6 +1,6 @@
-# Bringing Your Creations to Life
+# Physics With Rapier (In the Viewer)
 
-Pair Bevy with Rapier to simulate and test the parts you build in Truck. This chapter covers what the combo can do for engineering and assembly workflows and shows how to bolt physics onto your existing viewer.
+Pair Bevy with Rapier inside the same `truck_viewer` crate to simulate and test the parts you build in Truck. This chapter covers what the combo can do for engineering and assembly workflows and shows how to bolt physics onto your existing viewer.
 
 ## Why Bevy + Rapier?
 
@@ -12,11 +12,11 @@ Pair Bevy with Rapier to simulate and test the parts you build in Truck. This ch
 
 ## Minimal physics viewer (build on Chapter 4)
 
-Add Rapier next to Bevy in `Cargo.toml`:
+Add Rapier next to Bevy in `truck_viewer/Cargo.toml`:
 
 ```toml
 [dependencies]
-bevy = { version = "0.13", features = ["file_watcher"] }
+bevy = { version = "0.17", features = ["file_watcher"] }
 bevy_rapier3d = { version = "0.26", features = ["debug-render-3d"] }
 ```
 
@@ -109,4 +109,4 @@ Run it with:
 cargo run --bin viewer
 ```
 
-Keep your meshes in `assets/` so Bevy’s asset server (and hot reload) works. Pair with `cargo watch -x run` for rapid iteration while you model in Truck.
+Keep your meshes in `assets/` so Bevy’s asset server (and hot reload) works—the `file_watcher` feature picks up asset changes automatically. Use `cargo watch -x run` if you also want code edits to rebuild/restart without manual steps.

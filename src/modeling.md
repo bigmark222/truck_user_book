@@ -63,7 +63,7 @@ This is the representation used by major CAD kernels:
 Keep your Chapter 2 mesh crate as-is, and add a sibling B-rep crate. Target workspace layout:
 
 ```
-your-workspace/
+truck-workspace/
 ├─ truck_meshes/   # Chapter 2 mesh crate (unchanged)
 └─ truck_brep/     # Chapter 3 B-rep crate you’ll create below
 ```
