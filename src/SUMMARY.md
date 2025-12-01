@@ -24,12 +24,11 @@
     - [Cylinder](modeling_cylinder.md)
     - [Higher Level Modeling](modeling_higher_level_modeling.md)
 - [Chapter 4: Rendering](rendering.md)
-    - [Three-d Setup](rendering_first_empty_window.md)
+    - [Bevy Setup](rendering_first_empty_window.md)
     - [Render a Mesh](rendering_first_scene.md)
     - [Orbit + Hot Reload](rendering_update_scene.md)
     - [Reusable Viewer](rendering_simple_viewer.md)
-
-
+- [Chapter 5: Bringing Your Creations to Life](physics.md)
 
 
 

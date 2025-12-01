@@ -1,93 +1,89 @@
 # Render a Mesh
 
-Load a Truck-generated OBJ, set up a camera and a couple of lights, and render it with three-d.
+Load a Truck-generated OBJ, set up a camera and a couple of lights, and render it with Bevy.
 
-Make sure your `Cargo.toml` includes these three-d crates:
+Make sure your `Cargo.toml` includes Bevy (defaults keep the OBJ loader on):
 
 ```toml
-three-d = { version = "0.18.2", features = ["window"] }
-three-d-asset = { version = "0.9", features = ["obj"] }
+[dependencies]
+bevy = { version = "0.13", features = ["file_watcher"] }
 ```
+
+> Put your OBJ files under `assets/` so Bevy’s `AssetServer` can find them (e.g., `assets/output/mesh.obj`).
 
 ## Imports and main
 
-Start with the empty window example, then add the pieces below in this order:
+Start from the empty window example and add:
 
-- Keep the same `main` and `window` setup (no unwrap on `gl()`).
-- After grabbing `context`, insert the `Camera::new_perspective` setup.
-- Right after the camera, insert the directional and ambient lights.
-- After the lights, load the OBJ into `cpu_mesh`, compute normals, and build `model`.
-- Inside `render_loop`, keep `set_viewport(frame_input.viewport)` and render the model with both lights.
+- A 3D camera pointing at the origin.
+- A directional light plus some ambient light.
+- A PBR mesh loaded from your Truck-generated OBJ.
 
 Full listing for reference:
 
 ```rust
-use three_d::*;
+use bevy::prelude::*;
 
 fn main() {
-    let window = Window::new(WindowSettings {
-        title: "Truck mesh with three-d".into(),
-        ..Default::default()
-    })
-    .unwrap();
-    let context = window.gl();
+    App::new()
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Truck mesh with Bevy".into(),
+                ..Default::default()
+            }),
+            ..Default::default()
+        }))
+        .add_systems(Startup, setup)
+        .run();
+}
+
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+) {
+    commands.insert_resource(ClearColor(Color::srgb(0.06, 0.06, 0.08)));
+    commands.insert_resource(AmbientLight {
+        color: Color::WHITE,
+        brightness: 0.2,
+    });
 
     // Basic camera
-    let mut camera = Camera::new_perspective(
-        window.viewport(),
-        vec3(5.0, 4.0, 5.0),
-        vec3(0.0, 1.0, 0.0),
-        vec3(0.0, 1.0, 0.0),
-        degrees(55.0),
-        0.1,
-        50.0,
-    );
+    commands.spawn(Camera3dBundle {
+        transform: Transform::from_xyz(5.0, 4.0, 5.0)
+            .looking_at(Vec3::new(0.0, 1.0, 0.0), Vec3::Y),
+        ..Default::default()
+    });
 
     // White headlight + gentle fill
-    let light_primary =
-        DirectionalLight::new(&context, 1.0, Color::WHITE, &vec3(1.0, -1.0, -1.0)).unwrap();
-    let light_fill = AmbientLight::new(&context, 0.2, Color::WHITE);
-
-    // Load an OBJ exported from Truck (e.g., teapot.obj or cube.obj).
-    let path = "output/mesh.obj";
-    let mut cpu_mesh: three_d_asset::Mesh = three_d_asset::io::load(path)
-        .expect("failed to read OBJ")
-        .deserialize()
-        .expect("no mesh in OBJ");
-    cpu_mesh.compute_normals(); // ensure shading is smooth even if OBJ lacks normals
-
-    let mut model = Model::new_with_material(
-        &context,
-        &cpu_mesh,
-        PhysicalMaterial {
-            albedo: Color::new_opaque(200, 200, 200),
-            roughness: 0.35,
-            metallic: 0.05,
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            shadows_enabled: true,
+            illuminance: 8_000.0,
             ..Default::default()
         },
-    )
-    .unwrap();
+        transform: Transform::from_xyz(1.0, -1.0, -1.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..Default::default()
+    });
 
-    window.render_loop(move |frame_input| {
-        camera.set_viewport(frame_input.viewport);
-        let screen = frame_input.screen();
+    // Load an OBJ exported from Truck (e.g., teapot.obj or cube.obj).
+    let mesh_handle: Handle<Mesh> = asset_server.load("output/mesh.obj");
+    let material = materials.add(StandardMaterial {
+        base_color: Color::srgb(0.78, 0.78, 0.78),
+        perceptual_roughness: 0.35,
+        metallic: 0.05,
+        ..Default::default()
+    });
 
-        screen
-            .render(
-                ClearState::color_and_depth(0.06, 0.06, 0.08, 1.0, 1.0),
-                |renderer| {
-                    model.render(renderer, &camera, &[&light_primary, &light_fill]);
-                    Ok(())
-                },
-            )
-            .unwrap();
-
-        FrameOutput::default()
+    commands.spawn(PbrBundle {
+        mesh: mesh_handle,
+        material,
+        ..Default::default()
     });
 }
 ```
 
-Replace `"output/mesh.obj"` with any OBJ generated in previous chapters. The normals step ensures shading looks correct even if the OBJ didn’t include them.
+Replace `"output/mesh.obj"` with any OBJ generated in previous chapters (remember it should live under `assets/`). Bevy will hot-reload assets placed in `assets/` when the `file_watcher` feature is enabled.
 
 ## Run
 

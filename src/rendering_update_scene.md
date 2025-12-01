@@ -4,52 +4,90 @@ Add basic orbit controls and make the viewer reload whenever the OBJ file change
 
 ## Accept a mesh path
 
-Update `main` to read a file path (defaulting to `output/mesh.obj`):
+Update `main` to read a file path (defaulting to `assets/output/mesh.obj`):
 
 ```rust
-let path = std::env::args().nth(1).unwrap_or_else(|| "output/mesh.obj".into());
-let mut cpu_mesh = load_mesh(&path); // reuse the loader from the simple viewer section
+let mesh_path = std::env::args()
+    .nth(1)
+    .unwrap_or_else(|| "output/mesh.obj".into());
 ```
 
-Now you can run `cargo run -- output/mesh.obj` or point at any other OBJ generated earlier.
+Store it in a resource so startup systems can load it.
 
 ## Orbit + zoom
 
-Add simple mouse controls inside `render_loop`:
+A simple orbit controller using Bevy input events:
 
 ```rust
-let mut yaw = 0.0f32;
-let mut pitch = 0.0f32;
-let mut distance = 6.0f32;
+use bevy::prelude::*;
+use bevy::input::mouse::{MouseMotion, MouseWheel};
 
-window.render_loop(move |mut frame_input| {
-    // Mouse drag to orbit (read your preferred delta API from FrameInput)
-    if let Some(delta) = frame_input.mouse_motion() {
-        yaw += delta.x * 0.01;
-        pitch = (pitch + delta.y * 0.01).clamp(-1.2, 1.2);
+#[derive(Resource)]
+struct OrbitCamera {
+    yaw: f32,
+    pitch: f32,
+    radius: f32,
+    target: Vec3,
+}
+
+fn main() {
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .insert_resource(OrbitCamera {
+            yaw: 0.0,
+            pitch: 0.3,
+            radius: 6.0,
+            target: Vec3::ZERO,
+        })
+        .add_systems(Startup, setup_camera)
+        .add_systems(Update, orbit_camera)
+        .run();
+}
+
+fn setup_camera(mut commands: Commands) {
+    commands.spawn(Camera3dBundle {
+        transform: Transform::from_xyz(0.0, 0.0, 6.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..Default::default()
+    });
+}
+
+fn orbit_camera(
+    mouse_buttons: Res<Input<MouseButton>>,
+    mut mouse_motion_events: EventReader<MouseMotion>,
+    mut mouse_wheel_events: EventReader<MouseWheel>,
+    mut orbit: ResMut<OrbitCamera>,
+    mut query: Query<&mut Transform, With<Camera>>,
+) {
+    // Mouse drag to orbit
+    if mouse_buttons.pressed(MouseButton::Left) {
+        let mut delta = Vec2::ZERO;
+        for ev in mouse_motion_events.read() {
+            delta += ev.delta;
+        }
+        orbit.yaw += delta.x * 0.01;
+        orbit.pitch = (orbit.pitch + delta.y * 0.01).clamp(-1.2, 1.2);
+    } else {
+        mouse_motion_events.clear();
     }
 
     // Scroll to zoom
-    if let Some(scroll) = frame_input.scroll_delta() {
-        distance = (distance - scroll.y * 0.3).clamp(2.0, 20.0);
+    for ev in mouse_wheel_events.read() {
+        orbit.radius = (orbit.radius - ev.y * 0.3).clamp(2.0, 20.0);
     }
 
     // Update camera from spherical coords
-    let dir = vec3(
-        yaw.sin() * pitch.cos(),
-        pitch.sin(),
-        yaw.cos() * pitch.cos(),
-    );
-    camera.set_view(
-        vec3(0.0, 0.0, 0.0) + dir * distance,
-        vec3(0.0, 0.0, 0.0),
-        vec3(0.0, 1.0, 0.0),
-    );
-
-    // ... render code from previous section ...
+    if let Ok(mut transform) = query.get_single_mut() {
+        let dir = Vec3::new(
+            orbit.yaw.sin() * orbit.pitch.cos(),
+            orbit.pitch.sin(),
+            orbit.yaw.cos() * orbit.pitch.cos(),
+        );
+        let eye = orbit.target + dir * orbit.radius;
+        transform.translation = eye;
+        transform.look_at(orbit.target, Vec3::Y);
+    }
+}
 ```
-
-The exact mouse/scroll helpers depend on your three-d version; any delta events will work as long as you update `yaw`, `pitch`, and `distance` similarly.
 
 ## Auto-reload with `cargo watch`
 
@@ -59,13 +97,10 @@ Install once:
 cargo install cargo-watch
 ```
 
-Run the viewer and rerun on file changes:
+Run the viewer and rerun on file changes (so your mesh reloads cleanly):
 
 ```bash
-cargo watch -w output/mesh.obj -x 'run -- output/mesh.obj'
+cargo watch -w assets/output/mesh.obj -x 'run -- assets/output/mesh.obj'
 ```
 
-- `-w output/mesh.obj` watches the OBJ written by your Truck examples.
-- When the file is replaced (e.g., you run another example that overwrites it), `cargo watch` restarts your viewer so the new mesh loads immediately.
-
-You now have a lightweight orbit viewer that refreshes whenever your generated mesh changes.
+If you keep Bevy’s `file_watcher` feature enabled, asset edits in `assets/` will hot-reload without restarting; the `cargo watch` loop is still handy for rebuilding code changes alongside mesh updates.
