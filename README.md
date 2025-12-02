@@ -1,7 +1,7 @@
 # [Truck User Book](https://bigmark222.github.io/truck_user_book/)
 
 
-MDNbook content for Truck tutorials covering meshes, modeling (B-rep), and rendering. Use `mdbook` to build or serve locally.
+MDNbook content for Truck tutorials covering meshes and modeling (B-rep). Use `mdbook` to build or serve locally.
 
 ## Prerequisites
 
@@ -20,7 +20,7 @@ mdbook build
 
 ## Structure
 
-- `src/`: chapter content (mesh, modeling, rendering)
+- `src/`: chapter content (mesh, modeling)
 - `src/SUMMARY.md`: chapter ordering
 - `book/`: generated output (ignored by git)
 

@@ -23,14 +23,6 @@
     - [Torus](modeling_torus.md)
     - [Cylinder](modeling_cylinder.md)
     - [Higher Level Modeling](modeling_higher_level_modeling.md)
-- [Chapter 4: Viewer (Bevy Rendering)](rendering.md)
-    - [Bevy Setup](rendering_first_empty_window.md)
-    - [Render a Mesh](rendering_first_scene.md)
-    - [Orbit + Hot Reload](rendering_update_scene.md)
-    - [Reusable Viewer](rendering_simple_viewer.md)
-- [Chapter 5: Physics With Rapier](physics.md)
-- [Chapter 6: UI and Editor (`truck_ui`)](ui_editor.md)
-
 
 
 
